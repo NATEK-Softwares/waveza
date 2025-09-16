@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}{{ category_name }} Poems{% endblock %}
+
+{% block content %}
+<div class="container py-5 col-lg-12">
+    <h2 class="mb-4 text-center">{{ category_name }} Poems</h2>
+    <!-- Carousel Start -->
+    <div class="container-fluid mb-5 col-lg-12">
+        <div class="row px-xl-1">
+            <div class="col-lg-12">
+                <div id="header-carousel" class="carousel slide col-lg-12 carousel-fade mb-lg-0" style="width:100%" data-ride="carousel">
+                    <!-- <ol class="carousel-indicators">
+                        <li data-target="#header-carousel" data-slide-to="0" class="active"></li>
+                        <li data-target="#header-carousel" data-slide-to="1"></li>
+                    </ol> -->
+                    <div class="carousel-inner col-lg-12">
+                        <div class="carousel-item position-relative active" style="height: 430px;">
+                            <img class="position-absolute w-100 h-100" src="{{ url_for('static', filename='img/POETRY/cat-loving.jpg') }}" style="object-fit: cover; object-position: center">
+                            <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
+                                <h2 class="text-light text-uppercase font-weight-medium mb-3">Explore Poetry That Speaks To The Soul</h2>
+                            </div>
+                        </div>
+                        <div class="carousel-item position-relative" style="height: 430px;">
+                            <img class="position-absolute w-100 h-100" src="{{ url_for('static', filename='img/carousel-2.jpg') }}" style="object-fit: cover;">
+                            <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
+                                <h2 class="text-light text-uppercase font-weight-medium mb-3">Discover New Writers And Stories</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Carousel End -->
+
+    <div class="row">
+        {% for poem in poems %}
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm">
+                {% if poem.thumbnail %}
+                <img src="{{ poem.thumbnail }}" class="card-img-top" alt="">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ poem.title }}</h5>
+                    <div class="card-text" style="white-space: pre-line;">
+                        {{ poem.get_excerpt(150) }}
+                    </div>
+                    <a href="{{ url_for('poem', poem_id=poem.id, slug=poem.slug) }}" class="btn btn-primary mt-2">Read More</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}Mish Writes{% endblock %}</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <!-- Favicon -->
+    <link href="{{ url_for('static', filename='img/favicon.ico') }}" rel="icon">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">  
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="{{ url_for('static', filename='lib/animate/animate.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='lib/owlcarousel/assets/owl.carousel.min.css') }}" rel="stylesheet">
+
+    <!-- Bootstrap + Custom Styles -->
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/auth.css') }}" rel="stylesheet">
+
+    <!-- Quill Editor -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Navbar Start -->
+    <div class="container-fluid bg-dark mb-30 position-fixed" style="z-index: 10;">
+        <div class="row px-xl-5">
+            <div class="col-lg-12">
+                <nav class="navbar navbar-expand-lg bg-dark navbar-dark py-3 py-lg-0 px-0">
+                    <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
+                        <a href="{{ url_for('index') }}" class="text-decoration-none d-block py-2">
+                            <span class="h1 text-uppercase text-dark bg-light mr-0 px-2">MISH</span>
+                            <span class="h1 text-uppercase text-light bg-primary px-2" style="margin-left: -5px;">WRITES</span>
+                        </a>
+                        <div class="navbar-nav py-0 float-right">
+                            <a href="{{ url_for('index') }}" class="nav-item nav-link border-right border-left rounded align-content-center px-3 mr-1">Home</a>
+                            <!-- <a href="{{ url_for('category', name='category') }}" class="nav-item nav-link border-right px-3 rounded align-content-center mr-1">CATS</a> -->
+
+                            <!-- Quick Links to first 2 categories -->
+                            {% for cat, count in nav_categories[:2] %}
+                                {% if cat %}
+                                <a href="{{ url_for('category', name=cat) }}" class="nav-item nav-link border-right rounded align-content-center px-3 mr-1 fa fa-alert">
+                                    {{ cat.replace('-', ' ').title() }}
+                                    <!-- <p class="text-dark">({{ count }})</p> -->
+                                </a>
+                                {% endif %}
+                            {% endfor %}
+                            <!-- Dropdown for all categories -->
+                            <!-- Navbar Categories -->
+                            <a href="#" class="nav-link dropdown-toggle align-content-center border-right mr-1 rounded text-light" data-toggle="dropdown">Categories<i class="fa fa-angle-down mt-1"></i></a>
+                            <div class="dropdown-menu bg-primary rounded-0 border-0 m-0">
+                                {% for category, count in nav_categories %}
+                                    {% if category %}
+                                    <a href="{{ url_for('category', name=category) }}" class="dropdown-item">
+                                        {{ category.replace('-', ' ').title() }} ({{ count }})
+                                    </a>
+                                    {% endif %}
+                                {% endfor %}
+                                <div class="dropdown-divider"></div>
+                                <a href="{{ url_for('categories') }}" class="dropdown-item fw-bold text-dark">
+                                    View All Categories
+                                </a>
+                            </div>
+
+                            <a href="{{ url_for('contact') }}" class="nav-item nav-link align-content-center px-3 mr-1 border-right rounded">Contact</a>
+
+                            {% if current_user.is_authenticated %}
+                            <a href="{{ url_for('profile') }}" class="nav-item nav-link align-content-center px-3 text-danger rounded bg-info">Profile</a>
+                                <a href="{{ url_for('dashboard') }}" class="nav-item nav-link align-content-center px-3 text-danger rounded bg-secondary ml-3">Dashboard</a>
+                                <a href="{{ url_for('logout') }}" class="nav-item nav-link align-content-center px-3 bg-danger border-right rounded ml-3">Logout</a>
+                            {% else %}
+                                <a href="{{ url_for('login') }}" class="nav-item nav-link align-content-center px-3 bg-success rounded border-right">Login</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <!-- Navbar End -->
+
+    <main class="container-fluid px-xl-5" style="padding-top: 50px;">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <div class="container-fluid text-light mt-5 py-4 text-center" id="footer" style="background-color: rgb(111, 112, 112);">
+        <p>&copy; 2025 Mish Writes. All Rights Reserved.</p>
+        <p>Developed by <a href="https://natek-softwares.onrender.com" target="_blank"><img src="static/img/POETRY/icons/natek.png" style="width: 20px;" alt="">NAT<span style="transform: rotate(180deg); color: rgb(15, 15, 15);">E</span>K Softwares</a></p>
+    </div>
+
+    <!-- Bootstrap JS + Custom Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+
+    <!-- Bootstrap 4 JS + dependencies (must go before </body>) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Owl Carousel JS -->
+    <!-- <script src="{{ url_for('static', filename='lib/owlcarousel/owl.carousel.min.js') }}"></script> -->
+    <!-- Easing JS -->
+    <!-- <script src="{{ url_for('static', filename='lib/easing/easing.min.js') }}"></script> -->
+    <!-- Waypoints JS -->
+    <!-- <script src="{{ url_for('static', filename='lib/waypoints/waypoints.min.js') }}"></script> -->
+    <!-- Counterup JS -->
+    <!-- <script src="{{ url_for('static', filename='lib/counterup/counterup.min.js') }}"></script> -->
+    <!-- Contact JS -->
+    <!-- <script src="{{ url_for('static', filename='js/jqBootstrapValidation.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/contact.js') }}"></script> -->
+    <!-- Main JS -->
+    <!-- <script src="{{ url_for('static', filename='js/main.js') }}"></script> -->
+    <!-- SweetAlert2 JS -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
+    <script>
+        // Example: Show a success alert on page load
+        // {% with messages = get_flashed_messages(with_categories=true) %}
+        //     {% if messages %}
+        //         {% for category, message in messages %}
+        //             Swal.fire({
+        //                 icon: '{{ category }}' === 'success' ? 'success' : '{{ category }}' === 'error' ? 'error' : 'info',
+        //                 title: '{{ message }}',
+        //                 showConfirmButton: false,
+        //                 timer: 3000
+        //             });
+        //         {% endfor %}
+        //     {% endif %}
+        // {% endwith %}
+    </script>
+
+
+    <!-- Quill JS -->
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
+
+    <script>
+        function sharePoem(title, url) {
+            if (navigator.share) {
+                // ✅ Mobile (native share sheet)
+                navigator.share({
+                    title: title,
+                    text: "Check out this poem on MishWrites!",
+                    url: url
+                }).catch(err => console.error("❌ Share failed:", err));
+            } else {
+                // ✅ Desktop fallback: copy to clipboard + show prompt
+                navigator.clipboard.writeText(url).then(() => {
+                    alert("✅ Link copied to clipboard!\n\nYou can now paste it anywhere to share.");
+                }).catch(err => {
+                    // If clipboard API not available, show manual fallback
+                    prompt("Copy this link to share:", url);
+                });
+            }
+        }
+    </script>
+    <script>
+        function copyPoemLink(url) {
+            navigator.clipboard.writeText(url).then(() => {
+                alert("✅ Poem link copied to clipboard!");
+            }).catch(() => {
+                prompt("Copy this link:", url);
+            });
+        }
+    </script>
+
+
+</body>
+</html>

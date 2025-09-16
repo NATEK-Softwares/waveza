@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block title %}{{ poem.title }} - Poem{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<div class="container-fluid mt-5">
+    <div class="row px-xl-5">
+        <div class="col-lg-6 mx-auto">
+            <nav class="breadcrumb bg-light d-flex flex-column mb-30 align-content-center">
+                <h2 class="px-auto mx-auto py-auto">{{ poem.title }}</h2>
+                <div class="mr-auto ml-auto">
+                    <small>This poem is from the <b>{{poem.category}}</b> category</small>
+                </div>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<!-- Poem Detail -->
+<div class="container-fluid pb-5">
+    <div class="row px-xl-5">
+        <div class="col-lg-6 mx-auto h-auto mb-30">
+            <div class="h-100 bg-light p-30" style="border: 2px double #1add13;">
+                <div class="d-flex mb-3">
+                    <div class="text-primary mr-2">
+                        <!-- Example star ratings -->
+                        <small class="fas fa-star"></small>
+                        <small class="fas fa-star"></small>
+                        <small class="fas fa-star"></small>
+                        <small class="fas fa-star-half-alt"></small>
+                        <small class="far fa-star"></small>
+                    </div>
+                    <small class="pt-1">({{ poem.comments|length }} Reviews)</small>
+                </div>
+                <div class="mb-4 text-dark" style="white-space: pre-line;">
+                    {{ poem.content | safe }}
+                </div>
+                <div class="d-flex pt-2">
+                    <form method="POST" action="{{ url_for('like_poem', poem_id=poem.id) }}">
+                        <button type="submit" class="btn btn-outline-primary rounded">
+                            <i class="fa fa-heart"></i> Like ({{ poem.likes|length }})
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comments Section -->
+    <div class="row px-xl-5">
+        <div class="col-lg-10 mx-auto">
+            <div class="bg-light p-30 rounded">
+                <h4 class="mb-4">Comments</h4>
+                {% for comment in poem.comments %}
+                <div class="mb-3 border-bottom pb-2">
+                    <strong>{{ comment.user.username }}</strong>
+                    <small class="text-muted">{{ comment.timestamp.strftime('%b %d, %Y') }}</small>
+                    <p class="mb-1 ml-4" style="white-space: pre-line;">{{ comment.content }}</p>
+                </div>
+                {% endfor %}
+
+                {% if current_user.is_authenticated %}
+                <form method="POST" action="{{ url_for('add_comment', poem_id=poem.id) }}">
+                    <div class="form-group">
+                        <textarea name="content" rows="3" class="form-control" placeholder="Leave a comment..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-2 rounded">Post Comment</button>
+                    <div class="btn-group mt-2">
+                        <button type="button" class="btn btn-success rounded dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Share Poem <span class="fa fa-share"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" 
+                                href="https://wa.me/?text={{ poem.title }}%0A{{ url_for('poem', slug=poem.slug, poem_id=poem.id, _external=True) }}" 
+                                target="_blank">
+                                📱 WhatsApp
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" 
+                                href="https://www.facebook.com/sharer/sharer.php?u={{ url_for('poem', slug=poem.slug, poem_id=poem.id, _external=True) }}" 
+                                target="_blank">
+                                📘 Facebook
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" 
+                                href="https://twitter.com/intent/tweet?text={{ poem.title }}&url={{ url_for('poem', slug=poem.slug, poem_id=poem.id, _external=True) }}" 
+                                target="_blank">
+                                🐦 Twitter/X
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" 
+                                href="mailto:?subject={{ poem.title }}&body=Check out this poem: {{ url_for('poem', slug=poem.slug, poem_id=poem.id, _external=True) }}">
+                                ✉️ Email
+                                </a>
+                            </li>
+                            <li>
+                                <button class="dropdown-item" onclick="copyPoemLink('{{ url_for('poem', slug=poem.slug, poem_id=poem.id, _external=True) }}')">
+                                    📋 Copy Link
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                    </button>
+                </form>
+                {% else %}
+                <p><a href="{{ url_for('login') }}">Login</a> to post a comment.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

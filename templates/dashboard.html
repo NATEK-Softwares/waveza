@@ -1,0 +1,58 @@
+<!-- dashboard.html -->
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4">Welcome, <span class="text-success">{{ current_user.username }}</span></h2>
+    <div class="dashboard-stats mb-5">
+        <div class="stat-box">
+            <h3 class="text-light">{{ total_poems }}</h3>
+            <p>Poems</p>
+        </div>
+        <div class="stat-box">
+            <h3 class="text-light">{{ total_likes }}</h3>
+            <p>Total Likes</p>
+        </div>
+        <div class="stat-box">
+            <h3 class="text-light">{{ total_comments }}</h3>
+            <p>Total Comments</p>
+        </div>
+        <div class="stat-box">
+            <h3 class="text-light">{{ total_users }}</h3>
+            <p>Readers</p>
+        </div>
+
+    </div>
+
+
+    <div class="card mb-4 pb-0">
+        <div class="card-header text-dark">{{ current_user.username}}'s Poems</div>
+        <div class="card-body bg-dark">
+            <a href="{{ url_for('add_poem') }}" class="btn btn-success mb-3">Add New Poem</a>
+            <div class="mb-3" style="border-bottom: 2px solid #585656;"></div>
+            {% if poems %}
+            <ul class="list-group">
+                <div class="row">
+                    <!-- <li class="list-group-item  bg-warning"> -->
+                        {% for poem in poems %}
+                        <li class="list-group-item rounded bg-dark col-lg-4 py-3 col-md-12 d-flex w-100 justify-content-between" style="border-top: 3px solid #fff;">
+                            <a href="{{ url_for('poem', poem_id=poem.id, slug=poem.slug) }}" class="fw-bold fs-4">{{ poem.title }}</a>
+                            <div>
+                                <span class="mr-3" style="color: #cecccc;">{{ poem.likes|length }} Likes | {{ poem.comments|length }} Comments</span>
+                                <a href="{{ url_for('edit_poem', poem_id=poem.id) }}" class="btn btn-sm float-right mr-3 btn-warning">Edit</a>
+                                <form method="POST" action="{{ url_for('delete_poem', poem_id=poem.id) }}" class="d-inline float-right mr-2">
+                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                </form>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    <!-- </li> -->
+                </div>
+            </ul>
+        {% else %}
+        <p>No poems yet. Start by adding one!</p>
+        {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,36 @@
+/* new auth.css file for the above pages */
+
+.auth-wrapper {
+min-height: 100vh;
+display: flex;
+align-items: center;
+justify-content: center;
+background: #f8f9fa;
+}
+
+
+.auth-card {
+background: #fff;
+border-radius: 12px;
+box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+padding: 2rem;
+max-width: 420px;
+width: 100%;
+}
+
+
+.dashboard-stats {
+display: flex;
+flex-wrap: wrap;
+gap: 1.5rem;
+}
+
+
+.stat-box {
+flex: 1;
+background: #343a40;
+color: #fff;
+padding: 1.5rem;
+border-radius: 10px;
+text-align: center;
+}

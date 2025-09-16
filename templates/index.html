@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block title %}Poems - Mish Writes{% endblock %}
+
+{% block content %}
+<!-- Carousel Start -->
+<div class="container-fluid mb-1" style="margin-top: 80px;">
+    <div class="row px-xl-5">
+        <div class="col-lg-12">
+            <div id="header-carousel" class="carousel slide carousel-fade mb-lg-0" data-ride="carousel">
+                <!-- <ol class="carousel-indicators">
+                    <li data-target="#header-carousel" data-slide-to="0" class="active"></li>
+                    <li data-target="#header-carousel" data-slide-to="1"></li>
+                </ol> -->
+                <div class="carousel-inner">
+                    <div class="carousel-item position-relative active" style="height: 600px;">
+                        <img class="position-absolute w-100 h-100" src="{{ url_for('static', filename='img/POETRY/cat-self.png') }}" style="object-fit: cover;">
+                        <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
+                            <h2 class="text-light text-uppercase font-weight-medium mb-3">Explore Poetry That Speaks To The Soul</h2>
+                        </div>
+                    </div>
+                    <div class="carousel-item position-relative" style="height: 600px;">
+                        <img class="position-absolute w-100 h-100" src="{{ url_for('static', filename='img/carousel-2.jpg') }}" style="object-fit: cover;">
+                        <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
+                            <h2 class="text-light text-uppercase font-weight-medium mb-3">Discover New Writers And Stories</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Carousel End -->
+
+<!-- Featured Categories Start -->
+<h2 class="section-title position-relative text-uppercase text-center mx-xl-5 mt-5 mb-4">
+    <span class="bg-secondary px-3">Poem Categories</span>
+</h2>
+
+<div class="row">
+    {% for category, count in nav_categories [:6] %}
+        {% if category %}
+        <div class="col-lg-3 col-md-4 col-sm-6 py-1">
+            <a class="text-decoration-none" href="{{ url_for('category', name=category) }}">
+                <div class="cat-item d-flex align-items-center mb-4">
+                    <div class="overflow-hidden" style="width: 150px; height: 110px;">
+                        <img class="img-fluid" src="{{ url_for('static', filename='img/POETRY/cat-loving' + category + '.jpg') }}" alt="">
+                    </div>
+                    <div class="flex-fill pl-3">
+                        <h4>{{ category.replace('-', ' ').title() }}</h4>
+                        <small class="text-muted">({{ count }} poems)</small>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endif %}
+    {% endfor %}
+    <div class="col-lg-3 col-md-4 col-sm-6 ml-auto p-0 mr-auto  border-right rounded">
+        <a class="text-decoration-none text-center h-100" href="{{ url_for('categories', name='category')}}">
+            <div class="cat-item d-flex align-items-center pt-4 pb-4 border-right rounded">
+                <div class="flex-fill">
+                    <h4>
+                        More Categories <span class="fa fa-plus"></span>
+                    </h4>
+                </div>
+            </div>
+        </a>
+    </div>
+
+</div>
+<!-- Featured Categories End -->
+
+<!-- Poems Start -->
+<div class="container-fluid pt-5" id="biggest-reads">
+    <h2 class="section-title position-relative text-uppercase text-center mx-xl-5 mb-4">
+        <span class="bg-secondary px-3">Biggest Reads</span>
+    </h2>
+    <div class="row px-xl-5 pb-3">
+        {% for poem in poems  %}
+        <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
+            <a class="text-decoration-none" href="{{ url_for('poem', poem_id=poem.id, slug=poem.slug) }}" data-bs-toggle="modal" data-bs-target="#modal-{{ poem.slug }}">
+                <div class="cat-item d-flex align-items-center mb-4">
+                    <div class="overflow-hidden" style="width: 150px; height: 110px;">
+                        <img class="img-fluid w-100 h-100" src="{{ poem.thumbnail }}" alt="">
+                    </div>
+                    <div class="flex-fill pl-3">
+                        <h6>{{ poem.title }}</h6>
+                        <small class="text-body">{{ poem.author.username }}</small>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <!-- Modal for poem preview -->
+        <div class="modal fade" id="modal-{{ poem.slug }}" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content rounded">
+                    <div class="modal-header">
+                        <h2 class="modal-title">{{ poem.title }}</h2>
+                        <button type="button" class="btn text-danger" data-bs-dismiss="modal">
+                            <span class="fa fa-times"></span>
+                        </button>
+                    </div>
+                    <div class="mb-4 text-dark px-3 mt-3" style="white-space: pre-line;">
+                        {{ poem.get_excerpt()|safe }} 
+                        <a href="{{ url_for('poem', poem_id=poem.id, slug=poem.slug) }}"><i>...read more</i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<!-- Poems End -->
+{% endblock %}
