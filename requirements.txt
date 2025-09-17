@@ -6,3 +6,36 @@ Werkzeug
 python-slugify
 gunicorn
 unidecode
+beautifulsoup4
+flask-wtf
+flask-migrate
+flask-dotenv
+flask-flash
+# --- IGNORE ---
+# These are some packages that were considered but not used in the final implementation.
+# Flask-Mail
+# Flask-Admin
+# Flask-Uploads
+# Flask-Caching
+# Flask-Babel
+# Flask-Security
+# Flask-Testing
+# Flask-RESTful
+# Flask-SocketIO
+# Flask-Limiter
+# Flask-Session
+# Flask-Assets
+# Flask-Compress
+# Flask-Principal
+# Flask-User
+# Flask-Tracking
+# Flask-Profiler
+# Flask-GraphQL
+# Flask-APScheduler
+# Flask-Cors
+# Flask-Excel
+# Flask-FlatPages
+# Flask-Paginate
+# Flask-Redis
+# Flask-Sitemap
+# Flask-Uploads
