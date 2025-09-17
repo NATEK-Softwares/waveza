@@ -9,7 +9,7 @@ unidecode
 beautifulsoup4
 flask-wtf
 flask-migrate
-flask-dotenv
+load_dotenv
 flask-flash
 bleach
 # --- IGNORE ---
