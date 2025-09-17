@@ -7,7 +7,7 @@ from extensions import db
 from models import User, Poem, Like, Comment
 import os
 from werkzeug.utils import secure_filename
-import bleach
+# import bleach
 from sqlalchemy import func
 from slugify import slugify
 from flask_migrate import Migrate

@@ -11,6 +11,7 @@ flask-wtf
 flask-migrate
 flask-dotenv
 flask-flash
+bleach
 # --- IGNORE ---
 # These are some packages that were considered but not used in the final implementation.
 # Flask-Mail
