@@ -1,12 +1,12 @@
 from flask import Flask, render_template, redirect, url_for, request, flash
-from flask_sqlalchemy import SQLAlchemy
+# from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 # from models import db, User, Poem, Like, Comment
 from extensions import db
 from models import User, Poem, Like, Comment
 import os
-from werkzeug.utils import secure_filename
+# from werkzeug.utils import secure_filename
 # import bleach
 from sqlalchemy import func
 from slugify import slugify
