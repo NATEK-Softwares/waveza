@@ -10,6 +10,8 @@ beautifulsoup4
 flask-wtf
 flask-migrate
 load_dotenv
+dotenv
+getenv
 flask-flash
 bleach
 # --- IGNORE ---
