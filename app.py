@@ -17,8 +17,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
-SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
-# app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://mish_writes:Admin@localhost:5432/poetrydb"
+#SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://mish_writes:Admin@localhost:5432/poetrydb"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 app.config["MAX_CONTENT_LENGTH"] = 2 * 3024 * 3024  # 2MB
