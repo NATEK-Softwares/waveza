@@ -353,7 +353,6 @@ def upload_image():
     return {"error": "Invalid file type"}, 400
 
 
-
 # Run
 if __name__ == "__main__":
     with app.app_context():
