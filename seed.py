@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 
 def run_seed():
     with app.app_context():
-        # db.drop_all()   # ⚠️ Clears existing tables
+        db.drop_all()   # ⚠️ Clears existing tables
         db.create_all()
 
         # --- Users ---
@@ -17,8 +17,8 @@ def run_seed():
         )
 
         mishack = User(
-            username="mishack",
-            email="mishack@example.com",
+            username="OMEGA3",
+            email="mishwrites@email.com",
             password="writerpass",  # plain here, will be hashed
             role="writer"
         )

@@ -16,20 +16,23 @@ from dotenv import load_dotenv
 # Environment variables
 load_dotenv()
 
-app = Flask(__name__)
-SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
-# app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://mish_writes:Admin@localhost:5432/poetrydb"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
-app.config["MAX_CONTENT_LENGTH"] = 2 * 3024 * 3024  # 2MB
+def create_app():
+    app = Flask(__name__)
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
+    app.config["MAX_CONTENT_LENGTH"] = 2 * 1024 * 1024  # 2MB (fixed calc)
 
-db.init_app(app)
-migrate = Migrate(app, db)
+    db.init_app(app)
+    Migrate(app, db)
 
-# db.init_app(app)
+    return app
 
+app = create_app()
+
+# Login manager setup
 login_manager = LoginManager()
-login_manager.login_view = "login" #type: ignore
+login_manager.login_view = "login"  # type: ignore
 login_manager.init_app(app)
 
 @login_manager.user_loader
@@ -349,8 +352,9 @@ def upload_image():
     return {"error": "Invalid file type"}, 400
 
 
+
 # Run
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
+    # with app.app_context():
+        # db.create_all()
     app.run(debug=True)
