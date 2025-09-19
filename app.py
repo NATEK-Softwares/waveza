@@ -45,7 +45,7 @@ def load_user(user_id):
 
 @app.route("/")
 def index():
-    poems = Poem.query.order_by(Poem.id.desc()).all()
+    poems = Poem.query.order_by(Poem.id.desc()).all() # type: ignore
 
     # Get all categories with count of poems
     categories = [(c.category, c[1]) for c in db.session.query(
