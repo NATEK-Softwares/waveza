@@ -25,7 +25,8 @@ def create_app():
 
     db.init_app(app)
     Migrate(app, db)
-
+    print("✅ Database initialized and migrations set up.")
+    print("Database URL =", os.getenv("DATABASE_URL"))
     return app
 
 app = create_app()
