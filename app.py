@@ -16,6 +16,9 @@ from dotenv import load_dotenv
 # Environment variables
 load_dotenv()
 
+print("DATABASE_URL =", os.getenv("DATABASE_URL"))
+
+
 def create_app():
     app = Flask(__name__)
     app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
@@ -358,5 +361,8 @@ def upload_image():
 if __name__ == "__main__":
     with app.app_context():
         # db.create_all()
-        upgrade() # Apply all pending migrations to the remote database
+        # upgrade() # Apply all pending migrations to the remote database
+        print("Applying migrations...")
+        upgrade()
+        print("✅ Migrations applied!")
     app.run(debug=True)
