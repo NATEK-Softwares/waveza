@@ -10,7 +10,7 @@ import os
 # import bleach
 from sqlalchemy import func
 from slugify import slugify
-from flask_migrate import Migrate
+from flask_migrate import Migrate, upgrade
 from dotenv import load_dotenv
 
 # Environment variables
@@ -356,6 +356,7 @@ def upload_image():
 
 # Run
 if __name__ == "__main__":
-    # with app.app_context():
+    with app.app_context():
         # db.create_all()
+        upgrade() # Apply all pending migrations to the remote database
     app.run(debug=True)
