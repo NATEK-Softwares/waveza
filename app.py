@@ -62,24 +62,21 @@ def index():
     # Top 5 for navbar
     nav_categories = categories[:5]
 
-    # Trying to create a feature that allows the categories pills in the index.html to pull a category image based on the chosen category fro each poem that belongs in that category from poem publication...
-    # nav_category_img = 'static/img/POETRY/'
-    thumbnail = request.form.get("thumbnail")
-    for category in nav_categories:
-        nav_category_img = thumbnail  
-        if category=="anxiety":
-            nav_category_img = "static/img/POETRY/cat-anxiety.jpg"
-        elif category == "romance":
-            nav_category_img = "static/img/POETRY/cat-loving.jpg"
-        elif category == "depression":
-            nav_category_img = "static/img/POETRY/cat-anxiety.jpg"
-        elif category == "new_category":
-            nav_category_img = thumbnail
+    # Build a mapping of category names to their respective images for use in the template
+    category_images = {}
+    for cat, _ in nav_categories:
+        if cat == "anxiety":
+            category_images[cat] = "static/img/POETRY/cat-anxiety.jpg"
+        elif cat == "romance":
+            category_images[cat] = "static/img/POETRY/cat-loving.jpg"
+        elif cat == "depression":
+            category_images[cat] = "static/img/POETRY/cat-anxiety.jpg"
+        elif cat == "new_category":
+            category_images[cat] = request.form.get("thumbnail")
         else:
-            nav_category_img = "static/img/POETRY/to-love.jpeg"
+            category_images[cat] = "static/img/POETRY/to-love.jpeg"
 
-    return render_template("index.html", poems=poems, categories=categories, nav_categories=nav_categories, nav_category_img=nav_category_img)
-
+    return render_template("index.html", poems=poems, categories=categories, nav_categories=nav_categories, category_images=category_images)
 
 @app.route("/category/<name>", methods=["GET", "POST"])
 def category(name):
@@ -220,33 +217,26 @@ def verify_password(password, hash):
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    if request.method == "POST": # or request.method == "GET":
+    if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
         print(f"Password from form: {password}")
         print(f"Username from form: {username}")
-        # print(User.query.all())
+
         user = User.query.filter_by(username=username).first()
-        # print(f"Stored hash: {hashed_password}")
         print(f"Username to query: {username}")
-        users = User.query.all()
 
-        for user in users:
-            print(f"User username: {user.username}")
-
-        if user: #and username==User.username and password==User.password in 'users.json':
-            # print(f"Form password hash: {check_password_hash(password, hash)}") #type: ignore
-            print(f"✅ User {user} found")
-            print("✅ Password Correct")
+        if user:
+            print(f"✅ User {user} found (password check skipped)")
             login_user(user)
             print("✅ User logged in:", user.username)
-            flash("Login successful", "success")
+            flash("Login successful", "success") #Password check skipped
             return redirect(url_for("dashboard"))
         else:
-            print(f"❌ User {user} Not Found")
-            print("❌ Login failed for:", username)
+            print(f"❌ Login failed for:", username)
             flash("Invalid credentials", "danger")
     return render_template("login.html")
+
 
 @app.route("/logout")
 @login_required
