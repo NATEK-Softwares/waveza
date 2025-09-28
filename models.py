@@ -17,7 +17,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(50), nullable=False, unique=True)
     email = db.Column(db.String(120), nullable=False, unique=True)
     password = db.Column(db.String(200), nullable=False)  # stores HASH, not plain password
-    role = db.Column(db.String(20), default="reader")  # "writer" or "reader"
+    role = db.Column(db.String(20), default="")  # "writer" or "reader"
 
     poems = db.relationship("Poem", backref="author", lazy=True)
     comments = db.relationship("Comment", backref="user", lazy=True)
@@ -31,7 +31,7 @@ class User(db.Model, UserMixin):
         """Verify stored hash against a raw password"""
         return check_password_hash(self.password, raw_password)
 
-    def __init__(self, username: str, email: str, password: str, role: str = "reader") -> None:
+    def __init__(self, username: str, email: str, password: str, role: str = "writer") -> None:
         self.username = username
         self.email = email
         self.set_password(password)  # ✅ hash automatically
@@ -45,6 +45,11 @@ def slugify(text: str) -> str:
     text = re.sub(r'[^a-z0-9]+', '-', text)
     return text.strip('-')
 
+class Profile(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    bio = db.Column(db.String(500), nullable=False) #NEW COLUMN
+    profile_image = db.Column(db.String(255)) #NEW COLUMN
+    slug = db.Column(db.String(200), unique=True, nullable=False) #NEW COLUMN
 
 class Poem(db.Model):
     id = db.Column(db.Integer, primary_key=True)

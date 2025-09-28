@@ -4,7 +4,7 @@
 {% block content %}
 <div class="container py-4">
     <h2 class="mb-4">{{ current_user.username }}'s Profile</h2>
-    <a href="{{ url_for('add_poem') }}" class="btn btn-success mb-3  justify-content-between">Edit Profile</a>
+    <a href="{{ url_for('edit_profile') }}" class="btn btn-success mb-3  justify-content-between">Edit Profile</a>
     <div class="dashboard-stats mb-5">
         <div class="stat-box">
             <h3 class="text-light">{{ total_poems }}</h3>

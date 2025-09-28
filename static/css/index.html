@@ -37,27 +37,21 @@
 </h2>
 
 <div class="row">
-    {% for category, count in nav_categories [:6] %}
-        {% if category %}
         <div class="col-lg-3 col-md-4 col-sm-6 py-1">
-            <a class="text-decoration-none" href="{{ url_for('category', name=category) }}">
+            <a class="text-decoration-none" href="#">
                 <div class="cat-item d-flex align-items-center mb-4">
-                    {% if category %}
                     <div class="overflow-hidden" style="width: 150px; height: 110px;">
-                        <img class="img-fluid" src="{{ nav_category_img }}" alt="" style="width: 100%; height: 100%">
+                        <img class="img-fluid" src="{{ url_for('static', filename='img/POETRY/cat-loving' + '.jpg') }}" alt="">
                     </div>
-                    {% endif %}
                     <div class="flex-fill pl-3">
-                        <h4>{{ category.replace('-', ' ').title() }}</h4>
+                        <h4>Category Ttitle</h4>
                         <small class="text-muted">({{ count }} poems)</small>
                     </div>
                 </div>
             </a>
         </div>
-        {% endif %}
-    {% endfor %}
     <div class="col-lg-3 col-md-4 col-sm-6 ml-auto p-0 mr-auto  border-right rounded">
-        <a class="text-decoration-none text-center h-100" href="{{ url_for('categories', name='category')}}">
+        <a class="text-decoration-none text-center h-100" href="#">
             <div class="cat-item d-flex align-items-center pt-4 pb-4 border-right rounded">
                 <div class="flex-fill">
                     <h4>

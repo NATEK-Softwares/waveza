@@ -7,19 +7,14 @@
         <div class="col-lg-8">
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">Add New Poem</h4>
+                    <h4 class="mb-0">Edit Profile</h4>
                 </div>
                 <div class="card-body">
-                    <form method="POST" action="{{ url_for('add_poem') }}">
+                    <form method="POST" action="{{ url_for('edit_profile') }}">
                         <div class="form-group mb-3">
-                            <label for="title">Title</label>
-                            <input type="text" class="form-control" id="title" name="title" required>
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label for="category">Category</label>
+                            <label for="category">Categories</label>
                             <select class="form-control" id="category" name="category">
-                                <option value="">-- Select a category --</option>
+                                <checkbox value="">-- Select a category --</checkboc>
                                 <option value="romance">Romance</option>
                                 <option value="anxiety">Anxiety</option>
                                 <option value="self-introspection">Self-Introspection</option>
@@ -36,19 +31,17 @@
 
 
                         <div class="form-group mb-3">
-                            <label for="thumbnail">Thumbnail URL (optional)</label>
-                            <input type="text" class="form-control" id="thumbnail" name="thumbnail" placeholder="/static/img/your-image.jpg">
+                            <label for="profile">Profile URL (optional)</label>
+                            <input type="text" class="form-control" id="profile" name="profile" placeholder="/static/img/your-image.jpg">
                         </div>
 
                         <div class="form-group mb-3">
-                            <label for="content">Poem</label>
+                            <label for="bio">Bio</label>
                             <div class="form-group mb-3">
-                                <textarea name="content" id="content" style="height: 300px; width: 100%" placeholder="Poem goes here" required></textarea>
+                                <textarea name="bio" id="bio" style="height: 300px; width: 100%" placeholder="Bio goes here" required></textarea>
                             </div>
-
                         </div>
-
-                        <button type="submit" class="btn btn-success w-100">Publish Poem</button>
+                        <button type="submit" class="btn btn-success w-100">Update Profile</button>
                     </form>
                 </div>
             </div>
