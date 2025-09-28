@@ -467,7 +467,7 @@ def upload_image():
 # Run
 if __name__ == "__main__":
     with app.app_context():
-        # db.create_all()
+        db.create_all()
         # upgrade() # Apply all pending migrations to the remote database
         print("Applying migrations...")
         upgrade()
