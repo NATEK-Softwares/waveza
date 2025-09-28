@@ -74,7 +74,7 @@ def index():
         elif cat == "romance":
             category_images[cat] = "static/img/POETRY/cat-loving.jpg"
         elif cat == "depression":
-            category_images[cat] = "static/img/POETRY/cat-anxiety.jpg"
+            category_images[cat] = "static/img/POETRY/depression.jpg"
         elif cat == "new_category":
             category_images[cat] = request.form.get("thumbnail")
         else:
@@ -346,7 +346,12 @@ def add_poem():
         content = request.form.get("content")
         category = request.form.get("category")
         new_category = request.form.get("new category")
-        thumbnail = request.form.get("thumbnail")  # optional
+        file = request.files.get("thumbnail")
+        thumbnail = None
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+            thumbnail = f"uploads/{filename}"  # relative to 'static/
 
         # if not category:
         category = category or new_category #request.form.get("new category")
@@ -435,7 +440,7 @@ def delete_poem(poem_id):
 
 # Configure uploads
 UPLOAD_FOLDER = os.path.join("static", "uploads")
-ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp"}
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 if not os.path.exists(UPLOAD_FOLDER):
