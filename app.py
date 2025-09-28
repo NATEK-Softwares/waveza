@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, url_for, request, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-from werkzeug.security import generate_password_hash, check_password_hash
+# from werkzeug.security import generate_password_hash, check_password_hash
 from extensions import db
 from models import User, Poem, Like, Comment
 import os
@@ -11,8 +11,8 @@ from sqlalchemy import func
 from slugify import slugify
 from flask_migrate import Migrate, upgrade
 from dotenv import load_dotenv
-from passlib.hash import scrypt
-import json
+# from passlib.hash import scrypt
+# import json
 
 # Environment variables
 load_dotenv()
