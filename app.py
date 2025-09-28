@@ -163,7 +163,7 @@ def poem(poem_id, slug):
 
 #     return render_template("register.html")
 
-from passlib.hash import bcrypt, pbkdf2_sha256
+# from passlib.hash import bcrypt, pbkdf2_sha256
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -184,13 +184,13 @@ def register():
 
         # Hash the password using scrypt
         print(f"Hashing password...")
-        hashed_password = bcrypt.hash(password)
+        # hashed_password = bcrypt.hash(password)
         print(f"Successfully hashed password. Done!")
-        print(f"Hashed password: {hashed_password}")
+        # print(f"Hashed password: {hashed_password}")
         # hashed_password = generate_password_hash(password)
 
         # Create user and save to DB
-        new_user = User(username=username, email=email, password=hashed_password)
+        new_user = User(username=username, email=email, password=password)
         print(f"Adding new user to database: USER TABLE")
         db.session.add(new_user)
         db.session.commit()
@@ -206,13 +206,13 @@ def register():
 
 
 # Check which hash type it is
-def verify_password(password, hash):
-    try:
-        return bcrypt.verify(password, hash)
-    except ValueError:
-        # fallback to werkzeug/old hash
-        from werkzeug.security import check_password_hash
-        return check_password_hash(hash, password)
+# def verify_password(password, hash):
+#     try:
+#         return bcrypt.verify(password, hash)
+#     except ValueError:
+#         # fallback to werkzeug/old hash
+#         from werkzeug.security import check_password_hash
+#         return check_password_hash(hash, password)
 
 
 @app.route("/login", methods=["GET", "POST"])
