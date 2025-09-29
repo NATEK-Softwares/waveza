@@ -129,15 +129,21 @@ def notify():
 @app.route('/fix-alembic-version')
 @login_required
 def fix_alembic_version():
-    # only allow you (admin user) to run this
-    if current_user.username != 'MISH':
+    if current_user.username != 'MISH':  # 🔁 Replace with your admin username
         abort(403)
-    # Replace 'abc12345efgh' with your actual latest revision
-    latest_rev = '3481c85ebb7b'
-    sql = text("UPDATE alembic_version SET version_num = :ver")
-    db.session.execute(sql, {'ver': latest_rev})
-    db.session.commit()
-    return "Alembic version set to latest"
+
+    correct_revision = '3481c85ebb7b'  # ⬅️ Replace with your actual head revision
+
+    try:
+        db.session.execute(text("UPDATE alembic_version SET version_num = :rev"), {'rev': correct_revision})
+        db.session.commit()
+        return f"Alembic version set to {correct_revision}"
+    except Exception as e:
+        import traceback
+        print("Alembic fix error:", e)
+        traceback.print_exc()
+        return f"Error: {str(e)}", 500
+
 
 @app.route("/")
 def index():
