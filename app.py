@@ -53,6 +53,7 @@ def load_user(user_id):
 # ----------------PUSH NOTIFICATIONS-------#
 from pywebpush import webpush, WebPushException
 
+
 def send_push_notification(subscription_info, message_title="New Notification", message_body="You have a new message.", url="/"):
     payload = json.dumps({
         "title": message_title,
