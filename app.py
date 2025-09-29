@@ -441,6 +441,7 @@ def delete_poem(poem_id):
 
 
 # Configure uploads
+UPLOAD_FOLDER = os.path.join("static", "uploads")
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp"}
 app.config["UPLOAD_FOLDER"] = os.path.join("static", "uploads")
 
