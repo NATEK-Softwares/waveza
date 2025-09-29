@@ -37,6 +37,11 @@ def create_app():
 
 app = create_app()
 
+@app.route('/run-migrations')
+def run_migrations():
+    upgrade()
+    return "Migrations applied"
+
 with app.app_context():
     db.create_all()
     # upgrade()  # Uncomment if you want to use migrations
@@ -126,23 +131,23 @@ def notify():
 # ---------------- Routes ---------------- #
 
 
-@app.route('/fix-alembic-version')
-@login_required
-def fix_alembic_version():
-    if current_user.username != 'MISH':  # 🔁 Replace with your admin username
-        abort(403)
+# @app.route('/fix-alembic-version')
+# @login_required
+# def fix_alembic_version():
+#     if current_user.username != 'MISH':  # 🔁 Replace with your admin username
+#         abort(403)
 
-    correct_revision = '3481c85ebb7b'  # ⬅️ Replace with your actual head revision
+#     correct_revision = '3481c85ebb7b'  # ⬅️ Replace with your actual head revision
 
-    try:
-        db.session.execute(text("UPDATE alembic_version SET version_num = :rev"), {'rev': correct_revision})
-        db.session.commit()
-        return f"Alembic version set to {correct_revision}"
-    except Exception as e:
-        import traceback
-        print("Alembic fix error:", e)
-        traceback.print_exc()
-        return f"Error: {str(e)}", 500
+#     try:
+#         db.session.execute(text("UPDATE alembic_version SET version_num = :rev"), {'rev': correct_revision})
+#         db.session.commit()
+#         return f"Alembic version set to {correct_revision}"
+#     except Exception as e:
+#         import traceback
+#         print("Alembic fix error:", e)
+#         traceback.print_exc()
+#         return f"Error: {str(e)}", 500
 
 
 @app.route("/")
