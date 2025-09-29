@@ -1,4 +1,4 @@
-from flask import Flask, json, render_template, redirect, url_for, request, flash, session, jsonify
+from flask import Flask, json, render_template, redirect, url_for, request, flash, jsonify, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 # from werkzeug.security import generate_password_hash, check_password_hash
@@ -7,7 +7,7 @@ from models import User, Poem, Like, Comment
 import os
 from werkzeug.utils import secure_filename
 # import bleach
-from sqlalchemy import func
+from sqlalchemy import func, text
 from slugify import slugify
 from flask_migrate import Migrate, upgrade
 from dotenv import load_dotenv
@@ -39,7 +39,7 @@ app = create_app()
 
 with app.app_context():
     db.create_all()
-    upgrade()  # Uncomment if you want to use migrations
+    # upgrade()  # Uncomment if you want to use migrations
 
 # Login manager setup
 login_manager = LoginManager()
@@ -124,6 +124,20 @@ def notify():
 
 
 # ---------------- Routes ---------------- #
+
+
+@app.route('/fix-alembic-version')
+@login_required
+def fix_alembic_version():
+    # only allow you (admin user) to run this
+    if current_user.username != 'MISH':
+        abort(403)
+    # Replace 'abc12345efgh' with your actual latest revision
+    latest_rev = '3481c85ebb7b'
+    sql = text("UPDATE alembic_version SET version_num = :ver")
+    db.session.execute(sql, {'ver': latest_rev})
+    db.session.commit()
+    return "Alembic version set to latest"
 
 @app.route("/")
 def index():
