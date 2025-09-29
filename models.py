@@ -1,5 +1,4 @@
-from datetime import datetime, timezone
-from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 from flask_login import UserMixin
 from sqlalchemy.sql import func
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -8,7 +7,6 @@ from unidecode import unidecode
 from markupsafe import Markup
 from bs4 import BeautifulSoup
 from slugify import slugify
-from sqlalchemy import JSON, Column, String
 from extensions import db
 
 
@@ -18,7 +16,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), nullable=False, unique=True)
     password = db.Column(db.String(200), nullable=False)  # stores HASH, not plain password
     role = db.Column(db.String(20), default="")  # "writer" or "reader"
-    push_subscription = db.Column(JSON, nullable=True)
+    push_subscription = db.Column(db.JSON, nullable=True)
 
     poems = db.relationship("Poem", backref="author", lazy=True)
     comments = db.relationship("Comment", backref="user", lazy=True)
