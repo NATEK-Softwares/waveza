@@ -424,6 +424,7 @@ def add_poem():
             file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
             thumbnail = f"uploads/{filename}"  # relative to 'static/
 
+
         # if not category:
         category = category or new_category #request.form.get("new category")
         # else:
