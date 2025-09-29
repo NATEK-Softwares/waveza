@@ -39,7 +39,7 @@ app = create_app()
 
 with app.app_context():
     db.create_all()
-    # upgrade()  # Uncomment if you want to use migrations
+    upgrade()  # Uncomment if you want to use migrations
 
 # Login manager setup
 login_manager = LoginManager()
