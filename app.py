@@ -349,9 +349,11 @@ def add_poem():
         file = request.files.get("thumbnail")
         thumbnail = None
         if file and allowed_file(file.filename):
+            print("File is allowed:", file.filename)  # Debug
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
             thumbnail = f"uploads/{filename}"  # relative to 'static/
+
 
         # if not category:
         category = category or new_category #request.form.get("new category")
@@ -439,9 +441,8 @@ def delete_poem(poem_id):
 
 
 # Configure uploads
-UPLOAD_FOLDER = os.path.join("static", "uploads")
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp"}
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+app.config["UPLOAD_FOLDER"] = os.path.join("static", "uploads")
 
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
