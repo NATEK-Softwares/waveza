@@ -10,7 +10,7 @@
                     <h4 class="mb-0">Add New Poem</h4>
                 </div>
                 <div class="card-body">
-                    <form method="POST" action="{{ url_for('add_poem') }}">
+                    <form method="POST" action="{{ url_for('add_poem') }}" enctype="multipart/form-data">
                         <div class="form-group mb-3">
                             <label for="title">Title</label>
                             <input type="text" class="form-control" id="title" name="title" required>

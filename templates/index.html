@@ -37,7 +37,7 @@
 </h2>
 
 <div class="row">
-    {% for category, count in nav_categories [:6] %}
+    {% for category, count in nav_categories [:4] %}
         {% if category %}
         <div class="col-lg-3 col-md-4 col-sm-6 py-1">
             <a class="text-decoration-none" href="{{ url_for('category', name=category) }}">
@@ -54,7 +54,9 @@
         </div>
         {% endif %}
     {% endfor %}
-    <div class="col-lg-3 col-md-4 col-sm-6 ml-auto p-0 mr-auto  rounded">
+</div>
+<div class="row">
+    <div class="col-lg-3 col-md-4 col-sm-6 ml-auto p-0 mr-auto rounded">
         <a class="text-decoration-none text-center h-100" href="{{ url_for('categories', name='category')}}">
             <div class="cat-item d-flex align-items-center pt-4 pb-4 border-right rounded">
                 <div class="flex-fill">
@@ -71,10 +73,10 @@
 <!-- Poems Start -->
 <div class="container-fluid pt-5" id="biggest-reads">
     <h2 class="section-title position-relative text-uppercase text-center mx-xl-5 mb-4">
-        <span class="bg-secondary px-3">Biggest Reads</span>
+        <span class="bg-secondary px-3">Latest Poems</span>
     </h2>
     <div class="row px-xl-5 pb-3">
-        {% for poem in poems  %}
+        {% for poem in poems [-1:-5:-1]  %}
         <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
             <a class="text-decoration-none" href="{{ url_for('poem', poem_id=poem.id, slug=poem.slug) }}" data-bs-toggle="modal" data-bs-target="#modal-{{ poem.slug }}">
                 <div class="cat-item d-flex align-items-center mb-4">
@@ -83,7 +85,8 @@
                     </div>
                     <div class="flex-fill pl-3">
                         <h6>{{ poem.title }}</h6>
-                        <small class="text-body">{{ poem.author.username }}</small>
+                        <small class="text-body">{{ poem.author.username }}</small><br>
+                        <small class="text-muted">{{ poem.timestamp.strftime('%b %d, %Y') }}</small>
                     </div>
                 </div>
             </a>

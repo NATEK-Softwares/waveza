@@ -32,12 +32,18 @@
                     </div>
                     <small class="pt-1">({{ poem.comments|length }} Reviews)</small>
                 </div>
-                {% if poem.thumbnail %}
-                    <img src="{{ url_for('static', filename=poem.thumbnail) }}" alt="Poem image">
-                {% endif %}
+                <div class="mb-1 text-center w-100">
+                    {% if poem.thumbnail %}
+                    <img src="{{ url_for('static', filename=poem.thumbnail) }}" alt="Poem-image">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='uploads/Getty.jpg') }}" class="w-100" alt="Default Poem-image">
+                    {% endif %}
+                </div>
+                <!-- <p>Thumbnail: {{ poem.thumbnail }} </p> -->
                 <div class="mb-4 text-dark" style="white-space: pre-line;">
                     {{ poem.content | safe }}
                 </div>
+                <small class="text-muted">{{ poem.timestamp.strftime('%b %d, %Y') }}</small>
                 <div class="d-flex pt-2">
                     <form method="POST" action="{{ url_for('like_poem', poem_id=poem.id) }}">
                         <button type="submit" class="btn btn-outline-primary rounded">

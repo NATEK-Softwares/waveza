@@ -4,6 +4,8 @@
 {% block content %}
 <div class="container py-4">
     <h2 class="mb-4">Welcome, <span class="text-success">{{ current_user.username }}</span></h2>
+    <button id="enable-notifications">🔔 Enable Notifications</button>
+
     <div class="dashboard-stats mb-5">
         <div class="stat-box">
             <h3 class="text-light">{{ total_poems }}</h3>
@@ -55,4 +57,56 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const publicVapidKey = 'BCdRj1CvyIzXn3I356t7oZGpGalj5CqemFYCSds6DyOR8BHW3uy-yUcvnTaE6NQkCDSPZFMlzvtWKcj6k7LQO5g';
+
+        if ('serviceWorker' in navigator && 'PushManager' in window) {
+            navigator.serviceWorker.register('/static/service-worker.js')
+            .then(function(registration) {
+                console.log('Service worker registered');
+
+                document.getElementById('enable-notifications').addEventListener('click', function () {
+                    Notification.requestPermission().then(function(permission) {
+                        if (permission !== 'granted') {
+                            console.log('Permission not granted');
+                            return;
+                        }
+
+                        console.log('Attempting to subscribe for push notifications...');
+                        registration.pushManager.subscribe({
+                            userVisibleOnly: true,
+                            applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
+                        }).then(function(subscription) {
+                            console.log('Subscription successful:', subscription.toJSON());
+
+                            fetch('/subscribe', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(subscription.toJSON())
+                            });
+                        }).catch(function(error) {
+                            console.error('Subscription failed:', error);
+                        });
+                    });
+                });
+            });
+        }
+
+        function urlBase64ToUint8Array(base64String) {
+            const padding = '='.repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+            const rawData = window.atob(base64);
+            const outputArray = new Uint8Array(rawData.length);
+            for (let i = 0; i < rawData.length; ++i) {
+                outputArray[i] = rawData.charCodeAt(i);
+            }
+            return outputArray;
+        }
+    });
+</script>
+
 {% endblock %}

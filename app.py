@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, request, flash, session
+from flask import Flask, json, render_template, redirect, url_for, request, flash, session, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 # from werkzeug.security import generate_password_hash, check_password_hash
@@ -50,6 +50,76 @@ login_manager.init_app(app)
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+# ----------------PUSH NOTIFICATIONS-------#
+from pywebpush import webpush, WebPushException
+
+def send_push_notification(subscription_info, message_title="New Notification", message_body="You have a new message.", url="/"):
+    payload = json.dumps({
+        "title": message_title,
+        "body": message_body,
+        # "url": url
+    })
+
+    try:
+        webpush(
+            subscription_info=subscription_info,
+            data=payload,
+            vapid_private_key=VAPID_PRIVATE_KEY,
+            vapid_claims=VAPID_CLAIMS
+        )
+    except WebPushException as ex:
+        print("Web push failed: {}", repr(ex))
+
+VAPID_PRIVATE_KEY = "4yGY_ZSv-sWLFCbzm3tSZkSsi_tLtMQVVQK50bruqSM"
+VAPID_PUBLIC_KEY = "BCdRj1CvyIzXn3I356t7oZGpGalj5CqemFYCSds6DyOR8BHW3uy-yUcvnTaE6NQkCDSPZFMlzvtWKcj6k7LQO5g"
+VAPID_CLAIMS = {
+    "sub": "mailto:mishackmadubandlela@gmail.com"
+    }
+
+def send_push(subscription_info, title, body, url):
+    try:
+        webpush(
+            subscription_info=subscription_info,
+            data=json.dumps({
+                "title": title,
+                "body": body,
+                "url": url
+            }),
+            vapid_private_key=VAPID_PRIVATE_KEY,
+            vapid_claims=VAPID_CLAIMS
+        )
+    except WebPushException as ex:
+        print("Web push failed:", repr(ex))
+
+
+@app.route('/subscribe', methods=['POST'])
+@login_required
+def subscribe():
+    subscription_json = request.get_json()
+    if not subscription_json:
+        return jsonify({'error': 'Invalid subscription data'}), 400
+
+    # Save subscription JSON as string in the current user's record
+    current_user.push_subscription = json.dumps(subscription_json)
+    db.session.commit()
+
+    return jsonify({'success': True}), 201
+
+
+@app.route('/notify')
+@login_required
+def notify():
+    if not current_user.push_subscription:
+        return "No subscription for user", 400
+
+    subscription_info = json.loads(current_user.push_subscription)
+    send_push_notification(
+        subscription_info,
+        message_title="New Poem Published!",
+        message_body="Check out the latest poem in your favorite category.",
+        # url="/latest-poem"  # or wherever you want users to go
+    )
+    return "Notification sent!"
 
 
 # ---------------- Routes ---------------- #
@@ -349,6 +419,7 @@ def add_poem():
         file = request.files.get("thumbnail")
         thumbnail = None
         if file and allowed_file(file.filename):
+            print("File is allowed:", file.filename)  # Debug
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
             thumbnail = f"uploads/{filename}"  # relative to 'static/
@@ -439,12 +510,12 @@ def delete_poem(poem_id):
 
 
 # Configure uploads
-UPLOAD_FOLDER = os.path.join("static", "uploads")
+# UPLOAD_FOLDER = os.path.join("static", "uploads")
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp"}
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+app.config["UPLOAD_FOLDER"] = os.path.join("static", "uploads")
 
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
+if not os.path.exists(app.config["UPLOAD_FOLDER"]):
+    os.makedirs(app.config["UPLOAD_FOLDER"])
 
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
