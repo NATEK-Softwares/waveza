@@ -34,7 +34,7 @@
                 </div>
                 <div class="mb-1 text-center w-100">
                     {% if poem.thumbnail %}
-                    <img src="{{ url_for('static', filename=poem.thumbnail) }}" alt="Poem-image">
+                    <img src="{{ url_for('static', filename=poem.thumbnail) }}" alt="Poem-image" style="width: 100%;">
                     {% else %}
                     <img src="{{ url_for('static', filename='uploads/Getty.jpg') }}" class="w-100" alt="Default Poem-image">
                     {% endif %}
@@ -43,7 +43,9 @@
                 <div class="mb-4 text-dark" style="white-space: pre-line;">
                     {{ poem.content | safe }}
                 </div>
-                <small class="text-muted">{{ poem.timestamp.strftime('%b %d, %Y') }}</small>
+                <hr>
+                <p style="margin-bottom: -3px;">Author: <strong>{{ poem.author.username }}</strong></p>
+                <small class="text-muted">Date Posted: {{ poem.timestamp.strftime('%b %d, %Y') }}</small>
                 <div class="d-flex pt-2">
                     <form method="POST" action="{{ url_for('like_poem', poem_id=poem.id) }}">
                         <button type="submit" class="btn btn-outline-primary rounded">

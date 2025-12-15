@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Poems | Mish Writes{% endblock %}
+{% block title %}Poems | MishWrites{% endblock %}
 
 {% block content %}
 <!-- Carousel Start -->
@@ -76,7 +76,7 @@
         <span class="bg-secondary px-3">Latest Poems</span>
     </h2>
     <div class="row px-xl-5 pb-3">
-        {% for poem in poems [-1:-5:-1]  %}
+        {% for poem in poems [:8]  %}
         <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
             <a class="text-decoration-none" href="{{ url_for('poem', poem_id=poem.id, slug=poem.slug) }}" data-bs-toggle="modal" data-bs-target="#modal-{{ poem.slug }}">
                 <div class="cat-item d-flex align-items-center mb-4">

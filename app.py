@@ -364,7 +364,7 @@ def profile():
 
 @app.route("/edit_profile", methods=["GET", "POST"])
 @login_required
-def edit_profile():
+def edit_profile(bio, profile_image):
     if request.method == "POST":
         category = request.form.get("category")
         new_category = request.form.get("new category")
@@ -377,12 +377,12 @@ def edit_profile():
         #     return redirect(url_for("poem", poem_id=poem.id, slug=poem.slug))
 
 
-        if not bio or not category:
-            flash("Bio and content are required.", "danger")
-            return redirect(url_for("add_poem"))
+        # if not bio or not category:
+        #     flash("Bio and content are required.", "danger")
+        #     return redirect(url_for("edit_profile"))
         
-        if not profile_image:
-            return None
+        # if not profile_image:
+        #     return None
 
         # Generate slug (already done in model __init__, but safe to enforce)
         # profile.slug = slugify(profile)
@@ -391,8 +391,8 @@ def edit_profile():
         db.session.add(profile)
         db.session.commit()
 
-        flash("Poem published successfully!", "success")
-        return redirect(url_for("profile")) # poem_id=poem.id, slug=profile.slug))
+        flash("Profile edited successfully", "success")
+        return redirect(url_for("dashboard")) # poem_id=poem.id, slug=profile.slug))
 
     return render_template("edit_profile.html")
 

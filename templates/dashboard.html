@@ -1,10 +1,12 @@
 <!-- dashboard.html -->
 {% extends 'base.html' %}
-{% block title %}Dashboard{% endblock %}
+{% block title %}Poems | Dashboard{% endblock %}
 {% block content %}
 <div class="container py-4">
-    <h2 class="mb-4">Welcome, <span class="text-success">{{ current_user.username }}</span></h2>
-    <button id="enable-notifications">🔔 Enable Notifications</button>
+    <div class="row border-primary border-bottom mb-4">
+        <h2 class="mb-4 text-light">Welcome, <span class="text-success">{{ current_user.username }}</span></h2>
+        <button id="enable-notifications" class="mb-2 rounded float-right ml-auto">Allow Notifications 🔔 </button>
+    </div>
 
     <div class="dashboard-stats mb-5">
         <div class="stat-box">
@@ -30,7 +32,7 @@
     <div class="card mb-4 pb-0">
         <div class="card-header text-dark">{{ current_user.username}}'s Poems</div>
         <div class="card-body bg-dark">
-            <a href="{{ url_for('add_poem') }}" class="btn btn-success mb-3">Add New Poem</a>
+            <a href="{{ url_for('add_poem') }}" class="btn btn-success mb-3">Add New Poem <span class="fa fa-pen-alt"></span></a>
             <div class="mb-3" style="border-bottom: 2px solid #585656;"></div>
             {% if poems %}
             <ul class="list-group">

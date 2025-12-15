@@ -1,10 +1,10 @@
 <!-- Profile Page -->
 {% extends 'base.html' %}
-{% block title %}Profile{% endblock %}
+{% block title %}Poems | Profile{% endblock %}
 {% block content %}
 <div class="container py-4">
-    <h2 class="mb-4">{{ current_user.username }}'s Profile</h2>
-    <a href="{{ url_for('edit_profile') }}" class="btn btn-success mb-3  justify-content-between">Edit Profile</a>
+    <h2 class="mb-4 text-light">{{ current_user.username }}'s Profile</h2>
+    <a href="{{ url_for('edit_profile', bio=bio, profile_image=profile_image) }}" class="btn btn-success mb-3  justify-content-between">Edit Profile</a>
     <div class="dashboard-stats mb-5">
         <div class="stat-box">
             <h3 class="text-light">{{ total_poems }}</h3>
@@ -26,17 +26,20 @@
 
     <div class="container-fluid py-4">
         <div class="container p-2">
-            <h2 class="mb-1">Bio</h2>
+            <h2 class="text-light">Bio</h2>
             <div class="border-bottom mb-2"></div>
         </div>
         <div class="container p-2 bg-dark mb-4 rounded">
             <p> This is my bio...{{ current_user.bio }}</p>
         </div>
 
-        <h2>My Categories</h2>
+        <div class="container p-2">
+            <h2 class="text-light">My Categories</h2>
+            <div class="border-bottom mb-2"></div>
+        </div>
         <div class="container p-2 bg-dark rounded">
             <!-- <textarea name="content" rows="3" class="form-control" placeholder="Tell readers more about the kind of poetry you write..."></textarea> -->
-            <p>These are my categories that I write in...{{ current_user.my_categories }}</p>
+            <p>These are the categories that I write in...{{ current_user.my_categories }}</p>
         </div>
     
         

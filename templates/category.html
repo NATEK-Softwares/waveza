@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}{{ category }} Poems{% endblock %}
+{% block title %} Poems | {{ category }}{% endblock %}
 
 {% block content %}
 <div class="container py-5 col-lg-12">
@@ -15,7 +15,7 @@
                     </ol> -->
                     <div class="carousel-inner col-lg-12">
                         <div class="carousel-item position-relative active" style="height: 430px;">
-                            <img class="position-absolute w-100 h-100" src="{{ url_for('static', filename='img/POETRY/cat-loving.jpg') }}" style="object-fit: cover; object-position: center">
+                            <img class="position-absolute" src="{{ url_for('static', filename='img/POETRY/cat-loving.jpg') }}" style="object-fit: cover; object-position: center; width: 100%">
                             <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
                                 <h2 class="text-light text-uppercase font-weight-medium mb-3">Explore Poetry That Speaks To The Soul</h2>
                             </div>
@@ -42,9 +42,9 @@
                     <img src="{{ poem.thumbnail }}" class="card-img-top" alt="">
                 </div>
                 {% endif %}
-                <div class="card-body">
+                <div class="card-body" style="height: auto">
                     <h5 class="card-title">{{ poem.title }}</h5>
-                    <div class="card-text" style="white-space: pre-line;">
+                    <div class="card-text" style="height: 100px;">
                         {{ poem.get_excerpt(150) }}
                     </div>
                     <a href="{{ url_for('poem', poem_id=poem.id, slug=poem.slug) }}" class="btn btn-primary mt-2">Read More</a>
