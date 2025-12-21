@@ -1,4 +1,4 @@
-from flask import Flask, json, render_template, redirect, url_for, request, flash, jsonify, abort
+from flask import Flask, json, render_template, redirect, url_for, request, flash, jsonify, abort, Response
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 # from werkzeug.security import generate_password_hash, check_password_hash
@@ -13,6 +13,7 @@ from flask_migrate import Migrate, upgrade
 from dotenv import load_dotenv
 # from passlib.hash import scrypt
 # import json
+from datetime import datetime
 
 # Environment variables
 load_dotenv()
@@ -36,6 +37,22 @@ def create_app():
     return app
 
 app = create_app()
+
+@app.route("/sitemap.xml", methods=["GET"])
+def sitemap():
+    lastmod = datetime.utcnow().date().isoformat()
+    xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>{url_for('index', _external=True)}</loc>
+    <lastmod>{lastmod}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>
+"""
+    return Response(xml, mimetype="application/xml")
+
 
 @app.route('/run-migrations')
 def run_migrations():
@@ -129,26 +146,6 @@ def notify():
 
 
 # ---------------- Routes ---------------- #
-
-
-# @app.route('/fix-alembic-version')
-# @login_required
-# def fix_alembic_version():
-#     if current_user.username != 'MISH':  # 🔁 Replace with your admin username
-#         abort(403)
-
-#     correct_revision = '3481c85ebb7b'  # ⬅️ Replace with your actual head revision
-
-#     try:
-#         db.session.execute(text("UPDATE alembic_version SET version_num = :rev"), {'rev': correct_revision})
-#         db.session.commit()
-#         return f"Alembic version set to {correct_revision}"
-#     except Exception as e:
-#         import traceback
-#         print("Alembic fix error:", e)
-#         traceback.print_exc()
-#         return f"Error: {str(e)}", 500
-
 
 @app.route("/")
 def index():
