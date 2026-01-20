@@ -5,22 +5,89 @@
 <div class="auth-wrapper bg-transparent">
     <div class="auth-card">
         <h3 class="text-center mb-4">Login</h3>
-        <form method="POST" action="{{ url_for('login') }}">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn btn-close" data-bs-dismiss="alert"><span class="fas fa-times" style="border: 1px solid #787878ff; padding: 5px; border-radius: 3px;"></span></button>
+                </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <form method="POST" action="{{ url_for('login') }}" get_flashed_messages="true">
             <div class="form-group mb-3">
                 <label for="username">Username</label>
                 <input type="text" class="form-control" id="username" name="username" required>
             </div>
             <div class="form-group mb-4">
                 <label for="password">Password</label>
-                <input type="password" class="form-control" id="password" name="password">
+                <div class="password-input-wrapper">
+                    <input type="password" class="form-control" id="password" name="password">
+                    <button type="button" class="password-toggle" id="passwordToggle" onclick="togglePasswordVisibility('password')">
+                        <i class="bi bi-eye" style="color: #000000; font-weight: 600;"></i>
+                    </button>
+                </div>
             </div>
             <div class="form-group mb-4">
                 <label for="email">Email</label>
                 <input type="email" class="form-control" id="email" name="email">
             </div>
-            <button type="submit" class="btn btn-primary w-100">Login</button>
+            <button type="submit" class="btn btn-primary w-100" style="background:linear-gradient(135deg, #667EEA 0%, #764BA2 100%)">Login</button>
         </form>
     <p class="text-center mt-3">Don’t have an account? <a href="{{ url_for('register') }}">Register</a></p>
     </div>
 </div>
+
+<style>
+    .password-input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+    
+    .password-input-wrapper .form-control {
+        padding-right: 45px;
+    }
+    
+    .password-toggle {
+        position: absolute;
+        right: 12px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #000000;
+        padding: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: color 0.3s ease;
+    }
+    
+    .password-toggle:hover {
+        color: #333333;
+    }
+    
+    .password-toggle i {
+        font-size: 1.2rem;
+    }
+</style>
+
+<script>
+    function togglePasswordVisibility(fieldId) {
+        const field = document.getElementById(fieldId);
+        const button = field.nextElementSibling;
+        const icon = button.querySelector('i');
+        
+        if (field.type === 'password') {
+            field.type = 'text';
+            icon.classList.remove('bi-eye');
+            icon.classList.add('bi-eye-slash');
+        } else {
+            field.type = 'password';
+            icon.classList.remove('bi-eye-slash');
+            icon.classList.add('bi-eye');
+        }
+    }
+</script>
 {% endblock %}

@@ -39,7 +39,7 @@
 <div class="row">
     {% for category, count in nav_categories [:4] %}
         {% if category %}
-        <div class="col-lg-3 col-md-4 col-sm-6 py-1">
+        <div class="col-lg-4 col-md-4 col-sm-6 py-1">
             <a class="text-decoration-none" href="{{ url_for('category', name=category) }}">
                 <div class="cat-item d-flex align-items-center mb-4">
                     <div class="overflow-hidden" style="width: 150px; height: 110px;">
@@ -58,9 +58,9 @@
 <div class="row">
     <div class="col-lg-3 col-md-4 col-sm-6 ml-auto p-0 mr-auto rounded">
         <a class="text-decoration-none text-center h-100" href="{{ url_for('categories', name='category')}}">
-            <div class="cat-item d-flex align-items-center pt-4 pb-4 border-right rounded">
+            <div class="cat-item d-flex align-items-center pt-4 pb-4 rounded" id="more-categories">
                 <div class="flex-fill">
-                    <h4>
+                    <h4 class="text-light">
                         More Categories <span class="fa fa-plus"></span>
                     </h4>
                 </div>
@@ -77,11 +77,15 @@
     </h2>
     <div class="row px-xl-5 pb-3">
         {% for poem in poems [:8]  %}
-        <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
+        <div class="col-lg-4 col-md-4 col-sm-6 pb-1">
             <a class="text-decoration-none" href="{{ url_for('poem', poem_id=poem.id, slug=poem.slug) }}" data-bs-toggle="modal" data-bs-target="#modal-{{ poem.slug }}">
                 <div class="cat-item d-flex align-items-center mb-4">
-                    <div class="overflow-hidden" style="width: 150px; height: 110px;">
-                        <img class="img-fluid w-100 h-100" src="{{ poem.thumbnail }}" alt="">
+                    <div class="overflow-hidden rounded-left" style="width: 150px; height: 110px; display: flex; align-items: center; justify-content: center;">
+                        {% if poem.thumbnail %}
+                            <img class="img-fluid w-100 h-100" src="{{ url_for('static', filename=poem.thumbnail) }}" alt="{{ poem.title }}" style="object-fit: cover;">
+                        {% else %}
+                            <div style="text-align: center; color: white; font-size: 2rem;">✨</div>
+                        {% endif %}
                     </div>
                     <div class="flex-fill pl-3">
                         <h6>{{ poem.title }}</h6>
@@ -112,4 +116,24 @@
     </div>
 </div>
 <!-- Poems End -->
+
+<style>
+
+    #more-categories{
+        background: var(--gradient-accent);
+        /* transition: 0.3s ease; */
+    }
+
+    #more-categories:hover {
+        background: var(--accent-teal);
+        transition: 0.3s ease;
+    }
+
+    .cat-item:hover{
+        background: var(--accent-teal);
+        border-radius: 10px;
+        transition: 0.3s ease;
+    }
+</style>
+
 {% endblock %}

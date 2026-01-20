@@ -2,9 +2,9 @@
 {% extends 'base.html' %}
 {% block title %}Poems | Dashboard{% endblock %}
 {% block content %}
-<div class="container py-4">
+<div class="container py-4 my-5 mt-4">
     <div class="row border-primary border-bottom mb-4">
-        <h2 class="mb-4 text-light">Welcome, <span class="text-success">{{ current_user.username }}</span></h2>
+        <h2 class="mb-4 text-muted">Welcome, <span class="text-success">{{ current_user.username }}</span></h2>
         <button id="enable-notifications" class="mb-2 rounded float-right ml-auto">Allow Notifications 🔔 </button>
     </div>
 

@@ -44,7 +44,7 @@
                     {{ poem.content | safe }}
                 </div>
                 <hr>
-                <p style="margin-bottom: -3px;">Author: <strong>{{ poem.author.username }}</strong></p>
+                <p style="margin-bottom: -3px;">Author: <strong> <a href="{{ url_for('profile', username=poem.author.username) }}">{{ poem.author.username }}</a></strong></p>
                 <small class="text-muted">Date Posted: {{ poem.timestamp.strftime('%b %d, %Y') }}</small>
                 <div class="d-flex pt-2">
                     <form method="POST" action="{{ url_for('like_poem', poem_id=poem.id) }}">

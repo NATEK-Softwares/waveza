@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Add Poem{% endblock %}
+{% block title %}Edit Profile{% endblock %}
 
 {% block content %}
 <div class="container py-5">
@@ -7,97 +7,107 @@
         <div class="col-lg-8">
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">Edit Profile</h4>
+                    <h4 class="mb-0">Edit Your Profile</h4>
                 </div>
                 <div class="card-body">
-                    <form method="POST" action="{{ url_for('edit_profile') }}">
-                        <div class="form-group mb-3">
-                            <label for="category">Categories</label>
-                            <select class="form-control" id="category" name="category">
-                                <checkbox value="">-- Select a category --</checkboc>
-                                <option value="romance">Romance</option>
-                                <option value="anxiety">Anxiety</option>
-                                <option value="self-introspection">Self-Introspection</option>
-                                <option value="black-consciousness">Black Consciousness</option>
-                                <option value="democracy">Democracy</option>
-                                <option value="depression">Depression</option>
-                            </select>
+                    <form method="POST" action="{{ url_for('edit_profile') }}" enctype="multipart/form-data">
+                        
+                        <!-- Bio Section with Rich Text -->
+                        <div class="form-group mb-4">
+                            <label for="bio" class="form-label"><strong>Bio (Markdown Supported)</strong></label>
+                            <textarea name="bio" id="bio" class="form-control bio-editor" rows="6" placeholder="Tell readers about yourself... (supports **bold**, *italic*, [links](url))" required>{{ current_user.bio or '' }}</textarea>
+                            <small class="form-text text-muted">Share a bit about yourself. Supports markdown: **bold**, *italic*, `code`, [link](url), - lists</small>
                         </div>
 
-                        <div class="form-group mb-3">
-                            <label for="new-category">Or add a new category</label>
-                            <input type="text" name="new_category" class="form-control" id="new-category" placeholder="New Category">
+                        <!-- Profile Image Upload -->
+                        <div class="form-group mb-4">
+                            <label for="profile_image" class="form-label"><strong>Profile Image</strong></label>
+                            {% if current_user.profile_image %}
+                                <div class="mb-3">
+                                    <img src="{{ url_for('static', filename=current_user.profile_image) }}" alt="Current Profile" style="max-width: 200px; border-radius: 8px;">
+                                    <p class="text-muted mt-2">Current profile image</p>
+                                </div>
+                            {% endif %}
+                            <input type="file" name="profile_image" id="profile_image" class="form-control" accept="image/*">
+                            <small class="form-text text-muted">Upload a new profile image (PNG, JPG, JPEG, WEBP)</small>
                         </div>
 
-
-                        <div class="form-group mb-3">
-                            <label for="profile">Profile URL (optional)</label>
-                            <input type="text" class="form-control" id="profile" name="profile" placeholder="/static/img/your-image.jpg">
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label for="bio">Bio</label>
-                            <div class="form-group mb-3">
-                                <textarea name="bio" id="bio" style="height: 300px; width: 100%" placeholder="Bio goes here" required></textarea>
+                        <!-- Preferred Categories Section -->
+                        <div class="form-group mb-4">
+                            <label class="form-label"><strong>Preferred Poem Categories</strong></label>
+                            <small class="form-text text-muted d-block mb-3">Select the categories you're interested in:</small>
+                            <div class="row">
+                                {% for category in all_categories %}
+                                    <div class="col-md-6 col-lg-4 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="category_{{ category }}" 
+                                                   name="categories" value="{{ category }}"
+                                                   {% if category in user_categories %}checked{% endif %}>
+                                            <label class="form-check-label" for="category_{{ category }}">
+                                                {{ category.replace('-', ' ').title() }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                {% endfor %}
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-success w-100">Update Profile</button>
+
+                        <!-- Custom Categories Section -->
+                        <div class="form-group mb-4">
+                            <label class="form-label"><strong>Add Custom Categories</strong></label>
+                            <div class="input-group">
+                                <form method="POST" action="{{ url_for('add_custom_category') }}" class="w-100">
+                                    <div class="input-group mb-3">
+                                        <input type="text" name="category" class="form-control" placeholder="Enter custom category (e.g., Haiku, Sonnet)" maxlength="50">
+                                        <button class="btn btn-info" type="submit">Add Category</button>
+                                    </div>
+                                </form>
+                            </div>
+                            {% if current_user.custom_categories %}
+                                <div class="mt-2">
+                                    <small class="text-muted">Your custom categories:</small>
+                                    <div class="d-flex flex-wrap gap-2 mt-2">
+                                        {% for cat in current_user.custom_categories.split(',') %}
+                                            {% if cat.strip() %}
+                                                <span class="badge bg-success">{{ cat.strip().title() }}</span>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Privacy Settings -->
+                        <div class="form-group mb-4">
+                            <label class="form-label"><strong>Profile Visibility</strong></label>
+                            <form method="POST" action="{{ url_for('toggle_profile_privacy') }}">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="privacyToggle" 
+                                           {% if current_user.is_public %}checked{% endif %} disabled>
+                                    <label class="form-check-label" for="privacyToggle">
+                                        {% if current_user.is_public %}
+                                            Your profile is <strong>Public</strong> - Others can view it
+                                        {% else %}
+                                            Your profile is <strong>Private</strong> - Only you can view it
+                                        {% endif %}
+                                    </label>
+                                </div>
+                                <button type="submit" class="btn btn-sm btn-warning mt-2">Toggle Privacy</button>
+                            </form>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">Update Profile</button>
+                            <a href="{{ url_for('profile') }}" class="btn btn-secondary btn-lg">Cancel</a>
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
 <script>
-    var quill = new Quill('#editor', {
-        theme: 'snow',
-        modules: {
-            toolbar: [
-                ['bold', 'italic', 'underline', 'strike'],
-                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                ['blockquote', 'code-block'],
-                ['link', 'image']  // enable image upload button
-            ]
-        }
-    });
-
-    // Handle image uploads
-    function uploadImage(file) {
-        let formData = new FormData();
-        formData.append("image", file);
-
-        fetch("{{ url_for('upload_image') }}", {
-            method: "POST",
-            body: formData
-        })
-        .then(response => response.json())
-        .then(result => {
-            if (result.url) {
-                let range = quill.getSelection();
-                quill.insertEmbed(range.index, 'image', result.url);
-            } else {
-                alert("Upload failed: " + result.error);
-            }
-        })
-        .catch(err => {
-            console.error("Error uploading image:", err);
-        });
-    }
-
-    quill.getModule("toolbar").addHandler("image", () => {
-        let input = document.createElement("input");
-        input.type = "file";
-        input.accept = "image/*";
-        input.onchange = () => {
-            let file = input.files[0];
-            if (file) {
-                uploadImage(file);
-            }
-        };
-        input.click();
-    });
-
     // Submit: copy Quill content into hidden textarea
     document.querySelector("form").onsubmit = function() {
         document.querySelector("#content").value = quill.root.innerHTML;

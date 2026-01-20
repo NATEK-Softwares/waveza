@@ -8,6 +8,7 @@ from markupsafe import Markup
 from bs4 import BeautifulSoup
 from slugify import slugify
 from extensions import db
+import markdown as md
 
 
 class User(db.Model, UserMixin):
@@ -17,6 +18,13 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(200), nullable=False)  # stores HASH, not plain password
     role = db.Column(db.String(20), default="")  # "writer" or "reader"
     push_subscription = db.Column(db.JSON, nullable=True)
+    bio = db.Column(db.String(500), nullable=True)  # User bio
+    profile_image = db.Column(db.String(255), nullable=True)  # Profile image path
+    preferred_categories = db.Column(db.String(500), nullable=True)  # Comma-separated list of categories
+    custom_categories = db.Column(db.String(500), nullable=True)  # User-defined custom categories
+    profile_views = db.Column(db.Integer, default=0)  # Profile view count tracking
+    is_public = db.Column(db.Boolean, default=True)  # Public profile visibility
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)  # Account creation date
 
     poems = db.relationship("Poem", backref="author", lazy=True)
     comments = db.relationship("Comment", backref="user", lazy=True)
@@ -38,6 +46,82 @@ class User(db.Model, UserMixin):
 
     def __repr__(self) -> str:
         return f"<User {self.username}>"
+    
+    def get_profile_completion_percentage(self) -> int:
+        """Calculate profile completion percentage (0-100)"""
+        completion = 0
+        fields = {
+            'username': 20,
+            'email': 20,
+            'bio': 20,
+            'profile_image': 20,
+            'preferred_categories': 20
+        }
+        
+        if self.username:
+            completion += fields['username']
+        if self.email:
+            completion += fields['email']
+        if self.bio:
+            completion += fields['bio']
+        if self.profile_image:
+            completion += fields['profile_image']
+        if self.preferred_categories:
+            completion += fields['preferred_categories']
+        
+        return min(completion, 100)
+    
+    def get_all_categories(self) -> list:
+        """Get both preferred and custom categories as a list"""
+        categories = []
+        if self.preferred_categories:
+            categories.extend([cat.strip() for cat in self.preferred_categories.split(',') if cat.strip()])
+        if self.custom_categories:
+            categories.extend([cat.strip() for cat in self.custom_categories.split(',') if cat.strip()])
+        return list(set(categories))  # Remove duplicates
+    
+    def add_custom_category(self, category: str) -> bool:
+        """Add a custom category"""
+        if not category or len(category.strip()) == 0:
+            return False
+        category = category.strip().lower()
+        if self.custom_categories:
+            existing = [cat.strip() for cat in self.custom_categories.split(',')]
+            if category not in existing:
+                self.custom_categories += f",{category}"
+        else:
+            self.custom_categories = category
+        return True
+    
+    def increment_profile_views(self) -> None:
+        """Increment profile view count"""
+        self.profile_views = (self.profile_views or 0) + 1
+    
+    def get_bio_html(self) -> Markup:
+        """Render bio as markdown HTML"""
+        if not self.bio:
+            return Markup("")
+        
+        # Convert markdown to HTML
+        html = md.markdown(self.bio, extensions=['nl2br'])
+        
+        # Sanitize HTML to prevent XSS
+        soup = BeautifulSoup(html, "html.parser")
+        
+        # Only allow safe tags
+        allowed_tags = {'p', 'br', 'strong', 'em', 'u', 'code', 'a', 'ul', 'ol', 'li', 'blockquote', 'h1', 'h2', 'h3'}
+        
+        for tag in soup.find_all():
+            if tag.name not in allowed_tags:
+                tag.unwrap()
+        
+        # Add target="_blank" to links
+        for link in soup.find_all('a'):
+            link['target'] = '_blank'
+            link['rel'] = 'noopener noreferrer'
+        
+        return Markup(str(soup))
+
 
 def slugify(text: str) -> str:
     text = unidecode(text).lower()

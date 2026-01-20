@@ -12,10 +12,10 @@
 
     <!-- Open Graph / Facebook / LinkedIn / WhatsApp -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://mishwrites.onrender.com/">
+    <meta property="og:url" content="https://poetry.lavalite.co.za/">
     <meta property="og:title" content="MishWrites – Poetry Writing Platform">
     <meta property="og:description" content="Read, publish, and share original poetry. Join a global community of writers and readers.">
-    <meta property="og:image" content="https://mishwrites.onrender.com/static/images/og-image.png">
+    <meta property="og:image" content="{{ request.url_root.rstrip('/') }}{{ url_for('static', filename='img/NEW/icons/Fav.png') }}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:site_name" content="MishWrites">
@@ -29,7 +29,7 @@
 
 
     <!-- Favicon -->
-    <link href="{{ url_for('static', filename='img/NEW/icons/icon.png') }}" rel="icon">
+    <link href="{{ url_for('static', filename='img/POETRY/icons/poetry-art-icon-removebg.png') }}" rel="icon">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -45,6 +45,9 @@
     <!-- Bootstrap + Custom Styles -->
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/auth.css') }}" rel="stylesheet">
+    <!-- Modern Design Styles -->
+    <link href="{{ url_for('static', filename='css/modern.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/modern-components.css') }}" rel="stylesheet">
 
     <!-- Quill Editor -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
@@ -53,75 +56,99 @@
     <meta name="google-site-verification" content="JZP7WkJ3Fnk3POUKDs3QPXNBUy0IvTkvTgIUy8_En2I" />
 </head>
 
-<body style="background-color: #7c3c3c;">
+<body>
     <!-- Navbar Start -->
-    <div class="container-fluid mb-30 position-fixed" style="z-index: 10; background-color: rgb(111, 112, 112);">
-        <div class="row px-xl-5">
-            <div class="col-lg-12">
-                <nav class="navbar navbar-expand-lg navbar-dark py-3 py-lg-0 px-0" style="background-color: rgb(111, 112, 112);">
-                    <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
-                        <a href="{{ url_for('index') }}" class="text-decoration-none d-block py-2">
-                            <span class="h1 text-uppercase text-dark bg-light mr-0 px-2">MISH</span>
-                            <span class="h1 text-uppercase text-light bg-primary px-2" style="margin-left: -5px;">WRITES</span>
-                        </a>
-                        <div class="navbar-nav py-0 float-right">
-                            <a href="{{ url_for('index') }}" class="nav-item nav-link border-right border-left rounded align-content-center px-3 mr-1">Home</a>
-                            <!-- <a href="{{ url_for('category', name='category') }}" class="nav-item nav-link border-right px-3 rounded align-content-center mr-1">CATS</a> -->
-
-                            <!-- Quick Links to first 2 categories -->
-                            {% for cat, count in nav_categories[:2] %}
-                                {% if cat %}
-                                <a href="{{ url_for('category', name=cat) }}" class="nav-item nav-link  rounded align-content-center px-3 mr-1 fa fa-alert">
-                                    {{ cat.replace('-', ' ').title() }}
-                                    <!-- <p class="text-dark">({{ count }})</p> -->
-                                </a>
-                                {% endif %}
-                            {% endfor %}
-                            <!-- Dropdown for all categories -->
-                            <!-- Navbar Categories -->
-                            <a href="#" class="nav-link dropdown-toggle align-content-center  mr-1 rounded text-light" data-toggle="dropdown">Categories <i class="fa fa-angle-down mt-1"></i></a>
-                            <div class="dropdown-menu bg-primary rounded-0 border-0 m-0">
+    <div class="container-fluid navbar-modern position-fixed" style="z-index: 10; top: 0; left: 0; right: 0; width: 100%;">
+        <div class="container-xl px-4">
+            <nav class="navbar navbar-expand-lg py-0 px-0 navbar-modern">
+                <!-- Brand -->
+                <a href="{{ url_for('index') }}" class="navbar-brand d-flex align-items-center">
+                    <span> <img class="ml-3" src="{{ url_for('static', filename='img/POETRY/icons/poetry-art-icon-removebg.png') }}" alt="brand-icon" style="max-width: 70px;">MishWrites</span>
+                </a>
+                
+                <!-- Mobile Toggle -->
+                <button type="button" class="navbar-toggler border-0 p-0 mx-auto" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" style="filter: invert(0.9);">
+                    <!-- <span class="navbar-toggler-icon"></span> -->
+                     <h3 class="rounded p-1 text-muted border bg-danger" style="">MENU</h3>
+                </button>
+                
+                <!-- Navigation Items -->
+                <div class="collapse navbar-collapse" id="navbarCollapse" style="z-index: 10">
+                    <div class="navbar-nav ms-auto mx-auto">
+                        <!-- Home -->
+                        <a href="{{ url_for('index') }}" class="nav-link ml-2">Home</a>
+                        
+                        <!-- Quick Category Links -->
+                        {% for cat, count in nav_categories[:2] %}
+                            {% if cat %}
+                            <a href="{{ url_for('category', name=cat) }}" class="nav-link ml-2">
+                                {{ cat.replace('-', ' ').title() }}
+                            </a>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        <!-- Categories Dropdown -->
+                        <li class="nav-item dropdown">
+                            <a href="#" class="nav-link dropdown-toggle ml-2" data-bs-toggle="dropdown">
+                                Categories
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
                                 {% for category, count in nav_categories %}
                                     {% if category %}
-                                    <a href="{{ url_for('category', name=category) }}" class="dropdown-item">
-                                        {{ category.replace('-', ' ').title() }} ({{ count }})
-                                    </a>
+                                    <li>
+                                        <a href="{{ url_for('category', name=category) }}" class="dropdown-item ml-2 d-flex justify-content-between align-items-center">
+                                            {{ category.replace('-', ' ').title() }} <span class="badge-modern">{{ count }}</span>
+                                        </a>
+                                    </li>
                                     {% endif %}
                                 {% endfor %}
-                                <div class="dropdown-divider"></div>
-                                <a href="{{ url_for('categories') }}" class="dropdown-item fw-bold text-dark">
-                                    View All Categories
-                                </a>
-                            </div>
-
-                            <!-- <a href="{{ url_for('contact') }}" class="nav-item nav-link align-content-center px-3 mr-1 border-right rounded">Contact</a> -->
-
-                            {% if current_user.is_authenticated %}
-                            <a href="{{ url_for('profile') }}" class="nav-item nav-link align-content-center px-3 text-danger rounded bg-info">Profile</a>
-                                <a href="{{ url_for('dashboard') }}" class="nav-item nav-link align-content-center px-3 text-danger rounded bg-secondary ml-3">Dashboard</a>
-                                <a href="{{ url_for('logout') }}" class="nav-item nav-link align-content-center px-3 bg-danger border-right rounded ml-3">Logout</a>
-                            {% else %}
-                                <a href="{{ url_for('login') }}" class="nav-item nav-link align-content-center px-3 bg-success rounded border-right">Login</a>
-                            {% endif %}
-                        </div>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a href="{{ url_for('categories') }}" class="dropdown-item fw-bold ml-2">
+                                        View All Categories →
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        
+                        <!-- Auth Section -->
+                        {% if current_user.is_authenticated %}
+                            <a href="{{ url_for('profile') }}" class="nav-link navbar-auth-btn btn-profile ml-2">Profile</a>
+                            <a href="{{ url_for('dashboard') }}" class="nav-link navbar-auth-btn btn-dashboard ml-2">Dashboard</a>
+                            <a href="{{ url_for('logout') }}" class="nav-link navbar-auth-btn btn-logout ml-2">Logout</a>
+                        {% else %}
+                        <a href="{{ url_for('login') }}" class="nav-link navbar-auth-btn btn-login ml-2">Login</a>
+                        <a href="{{ url_for('register') }}" class="nav-link navbar-auth-btn btn-login ml-2">Register</a>
+                        {% endif %}
                     </div>
-                </nav>
-            </div>
+                </div>
+            </nav>
         </div>
     </div>
     <!-- Navbar End -->
 
-    <main class="container-fluid px-xl-5" style="padding-top: 50px;">
+    <main class="container-lg" style="padding-top: 80px;">
         {% block content %}{% endblock %}
     </main>
 
     <!-- Footer -->
-    <div class="container-fluid text-light mt-5 py-4 text-center" id="footer" style="background-color: rgb(111, 112, 112);">
-        <p>&copy; 2025 Mish Writes. All Rights Reserved.</p>
-        <p>Developed by <a href="https://natek-softwares.onrender.com" target="_blank"><img src="static/img/POETRY/icons/natek.png" style="width: 20px;" alt="">NAT<span style="transform: rotate(180deg); color: rgb(15, 15, 15);">E</span>K Softwares</a></p>
+    <div class="container-fluid footer-modern mt-5" id="footer">
+        <div class="container-xl">
+            <div class="row">
+                <div class="col-md-8 mx-auto">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <p class="mb-0">&copy; 2025 Mish Writes. All Rights Reserved.</p>
+                        <div class="text-end">
+                            <span class="d-inline me-2">Developed by</span> 
+                            <a href="https://natek-softwares.onrender.com" target="_blank" class="text-decoration-none">
+                                <img src="{{ url_for('static', filename='img/POETRY/icons/natek.png') }}" style="width: 20px; vertical-align: middle;" alt="NATEK-logo">
+                                NAT<span style="transform: rotate(90deg);" class="text-dark">E</span>K Softwares
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Bootstrap JS + Custom Scripts -->

@@ -5,6 +5,7 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from extensions import db
 from models import User, Poem, Like, Comment
 import os
+import uuid
 from werkzeug.utils import secure_filename
 # import bleach
 from sqlalchemy import func, text
@@ -23,17 +24,25 @@ print("DATABASE_URL =", os.getenv("DATABASE_URL"))
 
 def create_app():
     app = Flask(__name__)
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
+    
+    # Use PostgreSQL if DATABASE_URL is set, otherwise use SQLite for local development
+    database_url = os.getenv("DATABASE_URL")
+    if database_url:
+        app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+    else:
+        # Local SQLite database for development
+        app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///mishwrites.db"
+    
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
+    app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production")
     app.config["MAX_CONTENT_LENGTH"] = 2 * 1024 * 1024  # 2MB (fixed calc)
-    app.config["SESSION_COOKIE_SECURE"] = False
+    app.config["SESSION_COOKIE_SECURE"] = True
     app.config["SESSION_COOKIE_SAMESITE"] = 'Lax'
 
     db.init_app(app)
     Migrate(app, db)
     print("✅ Database initialized and migrations set up.")
-    print("Database URL =", os.getenv("DATABASE_URL"))
+    print("Database URL =", app.config["SQLALCHEMY_DATABASE_URI"])
     return app
 
 app = create_app()
@@ -60,7 +69,12 @@ def run_migrations():
     return "Migrations applied"
 
 with app.app_context():
-    db.create_all()
+    try:
+        db.create_all()
+        print("✅ Database tables created successfully")
+    except Exception as e:
+        print(f"⚠️ Could not create database tables on startup: {e}")
+        print("This may be normal if the database is not available yet.")
     # upgrade()  # Uncomment if you want to use migrations
 
 # Login manager setup
@@ -361,37 +375,119 @@ def profile():
 
 @app.route("/edit_profile", methods=["GET", "POST"])
 @login_required
-def edit_profile(bio, profile_image):
+def edit_profile():
     if request.method == "POST":
-        category = request.form.get("category")
-        new_category = request.form.get("new category")
-        profile_image = request.form.get("profile")  # optional
-        bio = request.form.get("bio")
-
-        # if not category:
-        category = category or new_category #request.form.get("new category")
-        # else:
-        #     return redirect(url_for("poem", poem_id=poem.id, slug=poem.slug))
-
-
-        # if not bio or not category:
-        #     flash("Bio and content are required.", "danger")
-        #     return redirect(url_for("edit_profile"))
+        bio = request.form.get("bio", "").strip()
+        selected_categories = request.form.getlist("categories")  # Get all selected categories
         
-        # if not profile_image:
-        #     return None
-
-        # Generate slug (already done in model __init__, but safe to enforce)
-        # profile.slug = slugify(profile)
-
-        # Save to database
-        db.session.add(profile)
+        # Validate bio
+        if not bio:
+            flash("Bio is required.", "danger")
+            return redirect(url_for("edit_profile"))
+        
+        # Handle profile image upload
+        profile_image_path = current_user.profile_image
+        if "profile_image" in request.files:
+            file = request.files["profile_image"]
+            if file and file.filename and allowed_file(file.filename):
+                # Generate secure filename
+                ext = file.filename.rsplit(".", 1)[1].lower()
+                filename = f"profile_{current_user.id}_{uuid.uuid4().hex}.{ext}"
+                filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+                file.save(filepath)
+                profile_image_path = f"uploads/{filename}"
+        
+        # Update user profile
+        current_user.bio = bio
+        current_user.profile_image = profile_image_path
+        current_user.preferred_categories = ",".join(selected_categories)
+        
         db.session.commit()
+        
+        flash("Profile updated successfully!", "success")
+        return redirect(url_for("profile"))
+    
+    # Get all available categories
+    all_categories = [
+        "romance",
+        "anxiety",
+        "self-introspection",
+        "black-consciousness",
+        "democracy",
+        "depression",
+        "pain",
+        "love"
+    ]
+    
+    # Get user's current categories
+    user_categories = current_user.preferred_categories.split(",") if current_user.preferred_categories else []
+    
+    return render_template("edit_profile.html", all_categories=all_categories, user_categories=user_categories)
 
-        flash("Profile edited successfully", "success")
-        return redirect(url_for("dashboard")) # poem_id=poem.id, slug=profile.slug))
 
-    return render_template("edit_profile.html")
+@app.route("/user/<username>")
+def public_profile(username):
+    """Display public user profile"""
+    user = User.query.filter_by(username=username).first()
+    
+    if not user:
+        abort(404)
+    
+    # Check if profile is public
+    if not user.is_public and (not current_user.is_authenticated or current_user.id != user.id):
+        flash("This profile is private.", "warning")
+        return redirect(url_for("index"))
+    
+    # Increment profile view count
+    user.increment_profile_views()
+    db.session.commit()
+    
+    # Get user's poems
+    poems = Poem.query.filter_by(author_id=user.id).all()
+    total_likes = sum(len(poem.likes) for poem in poems)
+    total_comments = sum(len(poem.comments) for poem in poems)
+    
+    return render_template("public_profile.html", 
+                         profile_user=user, 
+                         poems=poems, 
+                         total_poems=len(poems),
+                         total_likes=total_likes,
+                         total_comments=total_comments)
+
+
+@app.route("/add_custom_category", methods=["POST"])
+@login_required
+def add_custom_category():
+    """Add a custom category"""
+    category = request.form.get("category", "").strip()
+    
+    if not category:
+        flash("Category name cannot be empty.", "danger")
+        return redirect(url_for("edit_profile"))
+    
+    if len(category) > 50:
+        flash("Category name is too long (max 50 characters).", "danger")
+        return redirect(url_for("edit_profile"))
+    
+    if current_user.add_custom_category(category):
+        db.session.commit()
+        flash(f"Custom category '{category}' added successfully!", "success")
+    else:
+        flash("Failed to add custom category.", "danger")
+    
+    return redirect(url_for("edit_profile"))
+
+
+@app.route("/toggle_profile_privacy", methods=["POST"])
+@login_required
+def toggle_profile_privacy():
+    """Toggle profile public/private visibility"""
+    current_user.is_public = not current_user.is_public
+    db.session.commit()
+    
+    status = "public" if current_user.is_public else "private"
+    flash(f"Your profile is now {status}.", "success")
+    return redirect(url_for("profile"))
 
 
 @app.route("/poem/<int:poem_id>/like", methods=["POST"])
@@ -431,6 +527,17 @@ ALLOWED_ATTRS = {"img": ["src", "alt"]}
 #     return render_template("category.html", poems=poems_in_category, category=name)
 
 
+# ==================ADD VIDEO=====================
+VIDEO_UPLOAD_FOLDER = 'static/uploads/videos'
+ALLOWED_VIDEO_EXTENSIONS = ['mp4', 'webm', 'mov', 'mkv']
+app.config['VIDEO_UPLOAD_FOLDER'] = VIDEO_UPLOAD_FOLDER
+
+def allowed_video(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+
+
 @app.route("/add_poem", methods=["GET", "POST"])
 @login_required
 def add_poem():
@@ -439,43 +546,43 @@ def add_poem():
         content = request.form.get("content")
         category = request.form.get("category")
         new_category = request.form.get("new category")
+
+        # ---------- THUMBNAIL ----------
         file = request.files.get("thumbnail")
         thumbnail = None
         if file and allowed_file(file.filename):
-            print("File is allowed:", file.filename)  # Debug
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
-            thumbnail = f"uploads/{filename}"  # relative to 'static/
+            thumbnail = f"uploads/{filename}"
 
+        # ---------- VIDEO ----------
+        video_file = request.files.get("video")
+        video_url = None
+        if video_file and allowed_video(video_file.filename):
+            video_filename = f"{uuid.uuid4()}_{secure_filename(video_file.filename)}"
+            video_path = os.path.join(app.config["VIDEO_UPLOAD_FOLDER"], video_filename)
+            video_file.save(video_path)
+            video_url = f"uploads/videos/{video_filename}"
 
-        # if not category:
-        category = category or new_category #request.form.get("new category")
-        # else:
-        #     return redirect(url_for("poem", poem_id=poem.id, slug=poem.slug))
-
+        category = category or new_category
 
         if not title or not content:
             flash("Title and content are required.", "danger")
             return redirect(url_for("add_poem"))
 
-        # Create the Poem object
         poem = Poem(
             title=title,
             content=content,
             author=current_user,
-            category=category, #type: ignore
-            new_category=new_category, #type: ignore
-            thumbnail=thumbnail, #type: ignore
+            category=category,  # type: ignore
+            new_category=new_category,  # type: ignore
+            thumbnail=thumbnail,  # type: ignore
+            video_url=video_url,  # ✅ NEW
         )
 
-
-        # Generate excerpt
         poem.excerpt = poem.get_excerpt(length=300)
-
-        # Generate slug (already done in model __init__, but safe to enforce)
         poem.slug = slugify(title)
 
-        # Save to database
         db.session.add(poem)
         db.session.commit()
 
@@ -485,10 +592,13 @@ def add_poem():
     return render_template("add_poem.html")
 
 
+
+
 @app.route("/edit_poem/<int:poem_id>", methods=["GET", "POST"])
 @login_required
 def edit_poem(poem_id):
     poem = Poem.query.get_or_404(poem_id)
+
     if poem.author_id != current_user.id:
         flash("You are not allowed to edit this poem.", "danger")
         return redirect(url_for("dashboard"))
@@ -497,22 +607,33 @@ def edit_poem(poem_id):
         poem.title = request.form["title"]
 
         raw_content = request.form["content"]
-        clean_content = raw_content #bleach.clean(raw_content, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRS)
-        poem.content = clean_content   # ✅ now modifying instance, not class
+        poem.content = raw_content
 
         poem.category = request.form.get("category")
         if not poem.category:
             poem.category = request.form.get("new category")
-        # else:
-        #     return redirect(url_for("poem", poem_id=poem.id, slug=poem.slug))
 
-        poem.thumbnail = request.form.get("thumbnail") or poem.thumbnail
+        # ---------- THUMBNAIL ----------
+        thumb_file = request.files.get("thumbnail")
+        if thumb_file and allowed_file(thumb_file.filename):
+            filename = secure_filename(thumb_file.filename)
+            thumb_file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+            poem.thumbnail = f"uploads/{filename}"
+
+        # ---------- VIDEO ----------
+        video_file = request.files.get("video")
+        if video_file and allowed_video(video_file.filename):
+            video_filename = f"{uuid.uuid4()}_{secure_filename(video_file.filename)}"
+            video_path = os.path.join(app.config["VIDEO_UPLOAD_FOLDER"], video_filename)
+            video_file.save(video_path)
+            poem.video_url = f"uploads/videos/{video_filename}"
 
         db.session.commit()
         flash("Poem updated successfully!", "success")
         return redirect(url_for("dashboard"))
 
     return render_template("edit_poem.html", poem=poem)
+
 
 @app.route('/contact')
 def contact():
@@ -543,8 +664,6 @@ if not os.path.exists(app.config["UPLOAD_FOLDER"]):
 
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
-
-import uuid
 
 @app.route("/upload_image", methods=["POST"])
 @login_required
