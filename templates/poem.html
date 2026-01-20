@@ -38,6 +38,15 @@
                     {% else %}
                     <img src="{{ url_for('static', filename='uploads/Getty.jpg') }}" class="w-100" alt="Default Poem-image">
                     {% endif %}
+                    {% if poem.video_url %}
+                    <video loading="lazy" controls playsinline preload="metadata" controlsList="nodownload" style="width:100%; max-height:500px;" poster="{{ url_for('static', filename=poem.thumbnail) }}">
+                        <source src="{{ poem.video_url }}" type="video/mp4">
+                    </video>
+                    {% else %}
+                    <p class="text-muted mt-2">
+                        No video content has been added for this poem.
+                    </p>
+                    {% endif %}
                 </div>
                 <!-- <p>Thumbnail: {{ poem.thumbnail }} </p> -->
                 <div class="mb-4 text-dark" style="white-space: pre-line;">

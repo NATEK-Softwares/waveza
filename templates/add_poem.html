@@ -34,9 +34,13 @@
                             <input type="text" name="new_category" class="form-control" id="new-category" placeholder="New Category">
                         </div>
 
+                        <div class="form-group mb-3">
+                            <label for="video">Poem Video</label>
+                            <input type="file" name="video" class="form-control" id="video" accept="video/*" placeholder="Upload your video">
+                        </div>
 
                         <div class="form-group mb-3">
-                            <label for="thumbnail">Thumbnail (optional)</label>
+                            <label for="thumbnail">Poem Image (optional)</label>
                             <input type="file" class="form-control" id="thumbnail" name="thumbnail" required accepted="image/png, image/jpeg, image/jpg, image/webp">
                         </div>
 
@@ -109,6 +113,18 @@
     document.querySelector("form").onsubmit = function() {
         document.querySelector("#content").value = quill.root.innerHTML;
     };
+
+    // Video: Preview
+    function previewVideo(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const video = document.getElementById("videoPreview");
+        video.src = URL.createObjectURL(file);
+        video.style.display = "block";
+        video.load();
+    }
+
 </script>
 
 {% endblock %}

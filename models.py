@@ -142,6 +142,8 @@ class Poem(db.Model):
     category = db.Column(db.String(100), nullable=True)
     excerpt = db.Column(db.Text)
     thumbnail = db.Column(db.String(255))
+    video_url = db.Column(db.Text)
+    video_public_id = db.Column(db.String(255))
     slug = db.Column(db.String(200), unique=True, nullable=False)  # ✅ NEW COLUMN
 
 

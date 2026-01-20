@@ -532,9 +532,47 @@ VIDEO_UPLOAD_FOLDER = 'static/uploads/videos'
 ALLOWED_VIDEO_EXTENSIONS = ['mp4', 'webm', 'mov', 'mkv']
 app.config['VIDEO_UPLOAD_FOLDER'] = VIDEO_UPLOAD_FOLDER
 
-def allowed_video(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+# ==============REMOTE CLOUDINARY VIDEO SETUP==================
+import cloudinary
+import cloudinary.uploader
+
+cloudinary.config(
+    cloud_name="YOUR_CLOUD_NAME",
+    api_key="YOUR_API_KEY",
+    api_secret="YOUR_API_SECRET",
+    secure=True
+)
+
+ALLOWED_VIDEO_EXTENSIONS = {"mp4", "webm", "mov"}
+ALLOWED_VIDEO_MIMES = {"video/mp4", "video/webm", "video/quicktime"}
+
+def allowed_video(file):
+    if not file or not file.filename:
+        return False
+
+    ext = file.filename.rsplit(".", 1)[1].lower()
+    return (
+        "." in file.filename
+        and ext in ALLOWED_VIDEO_EXTENSIONS
+        and file.mimetype in ALLOWED_VIDEO_MIMES
+    )
+
+def upload_video_to_cloudinary(file):
+    result = cloudinary.uploader.upload(
+        file,
+        resource_type="video",
+        folder="poems/videos"
+    )
+    return result["secure_url"], result["public_id"]
+
+
+def delete_cloudinary_video(public_id):
+    if public_id:
+        cloudinary.uploader.destroy(
+            public_id,
+            resource_type="video"
+        )
 
 
 
@@ -547,40 +585,24 @@ def add_poem():
         category = request.form.get("category")
         new_category = request.form.get("new category")
 
-        # ---------- THUMBNAIL ----------
-        file = request.files.get("thumbnail")
-        thumbnail = None
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
-            thumbnail = f"uploads/{filename}"
-
         # ---------- VIDEO ----------
         video_file = request.files.get("video")
         video_url = None
-        if video_file and allowed_video(video_file.filename):
-            video_filename = f"{uuid.uuid4()}_{secure_filename(video_file.filename)}"
-            video_path = os.path.join(app.config["VIDEO_UPLOAD_FOLDER"], video_filename)
-            video_file.save(video_path)
-            video_url = f"uploads/videos/{video_filename}"
+        video_public_id = None
 
-        category = category or new_category
-
-        if not title or not content:
-            flash("Title and content are required.", "danger")
-            return redirect(url_for("add_poem"))
+        if video_file and allowed_video(video_file):
+            video_url, video_public_id = upload_video_to_cloudinary(video_file)
 
         poem = Poem(
             title=title,
             content=content,
             author=current_user,
-            category=category,  # type: ignore
-            new_category=new_category,  # type: ignore
-            thumbnail=thumbnail,  # type: ignore
-            video_url=video_url,  # ✅ NEW
+            category=category or new_category,
+            video_url=video_url,
+            video_public_id=video_public_id
         )
 
-        poem.excerpt = poem.get_excerpt(length=300)
+        poem.excerpt = poem.get_excerpt(300)
         poem.slug = slugify(title)
 
         db.session.add(poem)
@@ -633,6 +655,8 @@ def edit_poem(poem_id):
         return redirect(url_for("dashboard"))
 
     return render_template("edit_poem.html", poem=poem)
+
+
 
 
 @app.route('/contact')
