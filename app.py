@@ -1020,12 +1020,27 @@ def add_poem():
 @app.route("/api/poem", methods=["POST"])
 @login_required
 def api_add_poem():
-    data = request.get_json() or {}
-    title = data.get("title")
-    content = data.get("content")
-    category = data.get("category")
+    if request.content_type and 'multipart/form-data' in request.content_type:
+        # Handle multipart form data (with files)
+        title = request.form.get("title")
+        content = request.form.get("content")
+        category = request.form.get("category")
+        
+        # Handle file uploads
+        thumbnail_file = request.files.get("thumbnail")
+        video_file = request.files.get("video")
+    else:
+        # Handle JSON data
+        data = request.get_json() or {}
+        title = data.get("title")
+        content = data.get("content")
+        category = data.get("category")
+        thumbnail_file = None
+        video_file = None
+    
     if not title or not content:
         return jsonify({"success": False, "message": "Title and content required"}), 400
+    
     poem = Poem(
         title=title,
         content=content,
@@ -1033,7 +1048,8 @@ def api_add_poem():
         category=category,
     )
     poem.excerpt = poem.get_excerpt(300)
-    # slug generation same as above
+    
+    # slug generation
     base_slug = slugify(title)
     slug = base_slug
     counter = 1
@@ -1042,9 +1058,155 @@ def api_add_poem():
         counter += 1
     poem.slug = slug
     poem.approval_status = "pending"
+    
+    # Handle thumbnail upload
+    if thumbnail_file and allowed_file(thumbnail_file.filename):
+        filename = secure_filename(thumbnail_file.filename)
+        os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+        thumbnail_file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+        poem.thumbnail = f"uploads/{filename}"
+    
+    # Handle video upload
+    if video_file and allowed_video(video_file):
+        video_filename = f"{uuid.uuid4()}_{secure_filename(video_file.filename)}"
+        os.makedirs(app.config["VIDEO_UPLOAD_FOLDER"], exist_ok=True)
+        video_path = os.path.join(app.config["VIDEO_UPLOAD_FOLDER"], video_filename)
+        try:
+            video_file.stream.seek(0)
+        except Exception:
+            pass
+        video_file.save(video_path)
+        
+        # Upload to Cloudinary if configured
+        if USE_CLOUDINARY:
+            try:
+                with open(video_path, 'rb') as vf:
+                    cloud_url, cloud_id = upload_video_to_cloudinary(vf)
+                if cloud_url:
+                    poem.video_url = cloud_url
+                    poem.video_public_id = cloud_id
+                else:
+                    poem.video_url = f"uploads/videos/{video_filename}"
+            except Exception as e:
+                logging.exception("Cloudinary upload failed, using local file: %s", e)
+                poem.video_url = f"uploads/videos/{video_filename}"
+        else:
+            poem.video_url = f"uploads/videos/{video_filename}"
+    
     db.session.add(poem)
     db.session.commit()
     return jsonify({"success": True, "poem": poem.to_dict()})
+
+
+# ================== COMMENT API ENDPOINTS ==================
+
+@app.route("/api/poem/<int:poem_id>/comments", methods=["GET"])
+def api_get_comments(poem_id):
+    """Get all comments for a poem"""
+    poem = Poem.query.get_or_404(poem_id)
+    comments = Comment.query.filter_by(poem_id=poem_id).order_by(Comment.timestamp.asc()).all()
+    
+    comments_data = []
+    for comment in comments:
+        comments_data.append({
+            "id": comment.id,
+            "content": comment.content,
+            "timestamp": comment.timestamp.isoformat() if comment.timestamp else None,
+            "user_id": comment.user_id,
+            "username": comment.user.username if comment.user else None,
+            "parent_id": comment.parent_id
+        })
+    
+    return jsonify({"success": True, "comments": comments_data})
+
+
+@app.route("/api/poem/<int:poem_id>/comment", methods=["POST"])
+@login_required
+def api_add_comment(poem_id):
+    """Add a comment to a poem"""
+    data = request.get_json() or {}
+    content = data.get("content")
+    parent_id = data.get("parent_id")  # For nested replies
+    
+    if not content or not content.strip():
+        return jsonify({"success": False, "message": "Comment cannot be empty"}), 400
+    
+    poem = Poem.query.get_or_404(poem_id)
+    
+    comment = Comment(
+        content=content.strip(),
+        user_id=current_user.id,
+        poem_id=poem_id,
+        parent_id=parent_id
+    )
+    db.session.add(comment)
+    db.session.commit()
+    
+    return jsonify({
+        "success": True,
+        "comment": {
+            "id": comment.id,
+            "content": comment.content,
+            "timestamp": comment.timestamp.isoformat() if comment.timestamp else None,
+            "user_id": comment.user_id,
+            "username": comment.user.username,
+            "parent_id": comment.parent_id
+        }
+    })
+
+
+@app.route("/api/comment/<int:comment_id>", methods=["DELETE"])
+@login_required
+def api_delete_comment(comment_id):
+    """Delete a comment (only by comment author or admin)"""
+    comment = Comment.query.get_or_404(comment_id)
+    
+    if comment.user_id != current_user.id and current_user.role != "admin":
+        return jsonify({"success": False, "message": "Not authorized"}), 403
+    
+    db.session.delete(comment)
+    db.session.commit()
+    
+    return jsonify({"success": True})
+
+
+# ================== LIKE API ENDPOINTS ==================
+
+@app.route("/api/poem/<int:poem_id>/like", methods=["POST"])
+@login_required
+def api_like_poem(poem_id):
+    """Like or unlike a poem"""
+    poem = Poem.query.get_or_404(poem_id)
+    existing_like = Like.query.filter_by(user_id=current_user.id, poem_id=poem_id).first()
+    
+    if existing_like:
+        # Unlike
+        db.session.delete(existing_like)
+        db.session.commit()
+        return jsonify({"success": True, "liked": False, "likes_count": len(poem.likes)})
+    else:
+        # Like
+        like = Like(user_id=current_user.id, poem_id=poem_id)
+        db.session.add(like)
+        db.session.commit()
+        return jsonify({"success": True, "liked": True, "likes_count": len(poem.likes)})
+
+
+@app.route("/api/poem/<int:poem_id>/likes", methods=["GET"])
+def api_get_likes(poem_id):
+    """Get like status and count for a poem"""
+    poem = Poem.query.get_or_404(poem_id)
+    liked = False
+    
+    if current_user.is_authenticated:
+        existing_like = Like.query.filter_by(user_id=current_user.id, poem_id=poem_id).first()
+        liked = existing_like is not None
+    
+    return jsonify({
+        "success": True,
+        "liked": liked,
+        "likes_count": len(poem.likes)
+    })
 
 
 

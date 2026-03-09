@@ -11,10 +11,10 @@ flask-wtf
 flask-migrate
 load_dotenv
 pywebpush
-# dotenv
-# getenv
-# flask-flash
 bleach
+Flask-CORS
+PyInstaller
+cloudinary
 # --- IGNORE ---
 # These are some packages that were considered but not used in the final implementation.
 # Flask-Mail

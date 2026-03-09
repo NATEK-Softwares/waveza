@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import axios from '../api';
 
 interface PoemSummary {
   id: number;
@@ -12,7 +12,7 @@ const Dashboard: React.FC = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/dashboard', { withCredentials: true })
+    axios.get('/api/dashboard')
       .then(res => setData(res.data))
       .catch(err => {
         console.error(err);

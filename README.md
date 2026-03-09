@@ -107,7 +107,7 @@ WaveZA/
 ### Core Functionality
 - **User Authentication**: Register, login, logout with session management.
 - **Poem Management**: Create, view, edit poems with categories and media uploads.
-- **Social Engagement**: Likes, comments, notifications.
+- **Social Engagement**: Full CRUD for likes and threaded comments/replies.
 - **Profiles**: User dashboards, bio editing, public profiles.
 - **Admin Panel**: Moderation, approval workflows, analytics.
 - **Categories**: Browse poems by themes (e.g., anxiety, romance).
@@ -118,12 +118,16 @@ WaveZA/
 - **PWA Support**: Offline access, installable web app.
 - **Cross-Platform**: Native mobile and desktop apps.
 - **CORS Enabled**: Secure cross-origin communication.
+- **File Upload**: Direct image/video upload from React frontend.
+- **Offline Backend**: Bundled Flask executable for native apps.
 
 ### Technical Highlights
 - **Security**: Password hashing, CSRF protection, secure cookies.
 - **Media Handling**: Video/image uploads with Cloudinary integration.
 - **Notifications**: Push notifications for engagement.
 - **Database**: Migrations with Flask-Migrate.
+- **Comment System**: Threaded comments with nested replies.
+- **Like System**: Toggle likes with real-time count updates.
 
 ---
 
@@ -138,7 +142,7 @@ WaveZA/
 
 ### 1. Clone the Repository
 ```bash
-git clone <repository-url>
+git clone https://github.com/NATEK-Softwares/waveza.git
 cd WaveZA
 ```
 
@@ -205,8 +209,8 @@ npx tauri build
 
 ### Environment Variables (`.env`)
 ```env
-DATABASE_URL=sqlite:///mishwrites.db  # or PostgreSQL URL
-SECRET_KEY=your-secret-key
+DATABASE_URL=postgresql://postgres:Mishack%4010@localhost:5432/poetrydb  # or PostgreSQL URL
+SECRET_KEY=your-a9bbd956810c0a5578882c775d479f6624ba4a1f45cf976c1f0ea6c67405249f
 FLASK_ENV=development
 VAPID_PUBLIC_KEY=...  # For push notifications
 VAPID_PRIVATE_KEY=...
@@ -255,6 +259,27 @@ npx tauri build
 - Host React build on Netlify/CDN.
 - For PWA: Ensure HTTPS and service worker.
 
+### Offline Backend Bundling
+For native apps to work offline, bundle the Flask backend as a standalone executable:
+
+```bash
+# Install PyInstaller
+pip install PyInstaller
+
+# Create bundled backend
+python build_offline_bundle.py
+```
+
+This creates:
+- `bundled-backend/waveza-backend` (Linux/Mac executable)
+- `bundled-backend/waveza-backend.exe` (Windows executable)
+- `bundled-backend/start-backend.sh` (startup script)
+
+**Native App Integration**:
+- Copy `bundled-backend/` to your Capacitor/Tauri project
+- Start the executable when the app launches
+- React app automatically detects native context and connects to `localhost:5000`
+
 ---
 
 ## 📡 API Documentation
@@ -270,9 +295,18 @@ The Flask backend exposes RESTful endpoints under `/api/*`. All responses are JS
 - `GET /api/` - Home data (poems, categories)
 - `GET /api/poems` - All approved poems
 - `GET /api/poem/<id>` - Poem details
-- `POST /api/poem` - Create poem (body: title, content, category)
+- `POST /api/poem` - Create poem (multipart/form-data: title, content, category, thumbnail, video)
 - `GET /api/categories` - List categories
 - `GET /api/category/<name>` - Poems in category
+
+### Comments
+- `GET /api/poem/<id>/comments` - Get all comments for a poem
+- `POST /api/poem/<id>/comment` - Add comment/reply (body: content, parent_id?)
+- `DELETE /api/comment/<id>` - Delete comment (author or admin only)
+
+### Likes
+- `GET /api/poem/<id>/likes` - Get like status and count
+- `POST /api/poem/<id>/like` - Toggle like/unlike
 
 ### User
 - `GET /api/dashboard` - User dashboard data

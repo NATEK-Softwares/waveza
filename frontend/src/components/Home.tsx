@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import axios from '../api';
 import { Link } from 'react-router-dom';
 
 interface Poem {
@@ -24,7 +24,7 @@ const Home: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/')
+    axios.get('/api/')
       .then(response => {
         setPoems(response.data.poems);
         setCategories(response.data.categories || []);

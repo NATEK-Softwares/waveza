@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import axios from '../api';
 import { useNavigate } from 'react-router-dom';
 
 const Register: React.FC = () => {
@@ -11,7 +11,7 @@ const Register: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    axios.post('http://localhost:5000/api/register', { username, email, password }, { withCredentials: true })
+    axios.post('/api/register', { username, email, password })
       .then(res => {
         if (res.data.success) {
           navigate('/');

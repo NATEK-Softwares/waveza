@@ -225,9 +225,31 @@ class Comment(db.Model):
 
     def __repr__(self) -> str:
         return f"<Comment {self.content[:20]}...>"
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "content": self.content,
+            "timestamp": self.timestamp.isoformat() if self.timestamp else None,
+            "user_id": self.user_id,
+            "username": self.user.username if self.user else None,
+            "parent_id": self.parent_id,
+            "replies": [reply.to_dict() for reply in self.replies] if self.replies else []
+        }
 
 
 class Like(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    poem_id = db.Column(db.Integer, db.ForeignKey("poem.id"), nullable=False)
+
+    def __init__(self, user_id: int, poem_id: int) -> None:
+        self.user_id = user_id
+        self.poem_id = poem_id
+
+    def __repr__(self) -> str:
+        return f"<Like user={self.user_id} poem={self.poem_id}>"
     id = db.Column(db.Integer, primary_key=True)
 
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)

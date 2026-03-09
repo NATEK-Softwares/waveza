@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import axios from '../api';
 import { useNavigate } from 'react-router-dom';
 
 const EditProfile: React.FC = () => {
@@ -10,7 +10,7 @@ const EditProfile: React.FC = () => {
 
   useEffect(() => {
     // fetch current profile data
-    axios.get('http://localhost:5000/api/dashboard', { withCredentials: true })
+    axios.get('/api/dashboard')
       .then(res => {
         // using dashboard endpoint as an example; ideally create /api/user
         // we only care about bio here
@@ -21,7 +21,7 @@ const EditProfile: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    axios.post('http://localhost:5000/api/edit_profile', { bio, categories }, { withCredentials: true })
+    axios.post('/api/edit_profile', { bio, categories })
       .then(res => {
         if (res.data.success) {
           navigate('/profile');
