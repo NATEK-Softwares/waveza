@@ -35,16 +35,16 @@ WaveZA is a modern, cross-platform art sharing platform that has evolved from a 
 graph TB
     subgraph "User Devices"
         A[Web Browser] --> F[React SPA]
-        B[Mobile App (Capacitor)] --> F
-        C[Desktop App (Tauri)] --> F
+        B["Mobile App (Capacitor)"] --> F
+        C["Desktop App (Tauri)"] --> F
     end
 
     F --> G[Flask API Backend]
     G --> H[SQLAlchemy ORM]
-    H --> I[SQLite / PostgreSQL DB]
+    H --> I["SQLite / PostgreSQL DB"]
 
     subgraph "External Services"
-        J[Cloudinary (Media)]
+        J["Cloudinary (Media)"]
         K[Push Notifications]
     end
 
