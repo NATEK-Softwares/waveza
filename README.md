@@ -346,7 +346,113 @@ curl -X POST http://localhost:5000/api/login \
 
 ---
 
-## 📄 License
+## � Updates
+
+### March 9, 2026 - Complete Feature Implementation
+
+#### 1. **Full Comment/Like CRUD System** ✅
+Complete social engagement features implemented in both backend and React frontend.
+
+**Backend API Endpoints**:
+- `GET /api/poem/<id>/comments` - Fetch all comments with threaded replies
+- `POST /api/poem/<id>/comment` - Add new comments or replies (supports `parent_id` for nested replies)
+- `DELETE /api/comment/<id>` - Delete comments (author or admin only)
+- `GET /api/poem/<id>/likes` - Get current like status and total like count
+- `POST /api/poem/<id>/like` - Toggle like/unlike for authenticated users
+
+**React Frontend Updates**:
+- Enhanced `PoemDetail.tsx` with full comment system
+- Threaded reply functionality with visual indentation
+- Real-time like counter with heart icon toggle
+- Comment author and timestamp display
+- Dynamic comment loading and updates
+- Comment deletion capability
+
+**Database Models**:
+- Added `to_dict()` method to Comment model for JSON serialization
+- Supports nested comment threads via `parent_id` relationships
+
+#### 2. **File Upload from React** ✅
+Direct image and video uploads from the React frontend to the Flask backend.
+
+**Frontend Features** (AddPoem.tsx):
+- Thumbnail image upload (JPG, PNG, WebP)
+  - File size validation: Max 5MB
+  - Preview of selected file with size display
+  - Type validation before upload
+  
+- Video upload (MP4, WebM, MOV)
+  - File size validation: Max 50MB
+  - Supported formats: MP4, WebM, MOV, MKV
+  - Progress feedback during upload
+  - Error handling with user-friendly messages
+
+**Backend Implementation**:
+- Updated `/api/poem` endpoint to accept `multipart/form-data`
+- Automatic file validation (extension + mimetype)
+- Cloudinary integration for video storage (fallback to local)
+- UUID-based filename generation to prevent collisions
+- Local storage at `static/uploads/videos/` as fallback
+
+**File Handling**:
+```bash
+Thumbnails: static/uploads/
+Videos: static/uploads/videos/
+Cloudinary: Secondary video storage option
+```
+
+#### 3. **Offline Backend Bundling** ✅
+Flask backend packaged as standalone executable for native app distribution.
+
+**Build Tools Created**:
+- `build_offline_bundle.py` - Automated build script using PyInstaller
+- Generates platform-specific executables:
+  - Linux/Mac: `waveza-backend` (ELF executable)
+  - Windows: `waveza-backend.exe`
+  - All platforms: `start-backend.sh` startup script
+
+**Intelligent API URL Detection** (New `api.ts`):
+- Automatically detects native app context (Capacitor/Tauri)
+- Routes to `localhost:5000` in native apps for offline operation
+- Routes to configured API server in web browsers
+- Global axios configuration with credentials support
+
+**React Component Updates**:
+All components now use centralized API configuration:
+- `Home.tsx`, `Login.tsx`, `Register.tsx`
+- `Dashboard.tsx`, `EditProfile.tsx`
+- `PoemDetail.tsx`, `AddPoem.tsx`
+- All API calls use relative paths via configured base URL
+
+**Native App Integration**:
+1. Copy `bundled-backend/` to Capacitor/Tauri projects
+2. Start the backend executable on app launch
+3. React automatically connects to local server
+4. Works fully offline with bundled database
+
+**Building the Bundle**:
+```bash
+python3 build_offline_bundle.py
+# Creates: bundled-backend/waveza-backend (or .exe)
+```
+
+#### 4. **Dependencies Added** ✅
+Enhanced `requirements.txt` with production-ready dependencies:
+- `Flask-CORS` - Cross-origin request support for API
+- `PyInstaller` - Executable bundling for offline apps
+- `cloudinary` - Optional media storage integration
+
+#### 5. **Updated API Documentation** ✅
+README now includes:
+- Comment endpoints with examples
+- Like endpoints and toggle mechanism
+- File upload specifications
+- Example API requests and responses
+- Offline bundling instructions
+
+---
+
+## �📄 License
 
 Licensed under the MIT License. See [LICENSE.txt](LICENSE.txt) for details.
 
@@ -362,6 +468,6 @@ Licensed under the MIT License. See [LICENSE.txt](LICENSE.txt) for details.
 
 *WaveZA: Where art meets community. 🌟*
 
-📖 With this README, any developer can **understand, set up, and extend MishWrites** confidently.
+📖 With this README, any developer can **understand, set up, and extend WaveZA** confidently.
 
 ---
