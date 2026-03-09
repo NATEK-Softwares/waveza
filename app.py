@@ -12,6 +12,7 @@ from sqlalchemy import func, text, desc
 from slugify import slugify
 from flask_migrate import Migrate, upgrade
 from dotenv import load_dotenv
+from flask_cors import CORS
 # from passlib.hash import scrypt
 # import json
 from datetime import datetime, timedelta
@@ -53,6 +54,8 @@ def create_app():
     return app
 
 app = create_app()
+
+CORS(app, supports_credentials=True)
 
 # Add template filter for local time (assuming UTC+2)
 app.jinja_env.filters['localtime'] = lambda dt: dt + timedelta(hours=2) if dt else None
@@ -350,13 +353,72 @@ def index():
     return render_template("index.html", poems=poems, categories=categories, nav_categories=nav_categories, category_images=category_images)
 
 
-@app.route("/privacy")
-def privacy():
-    now = datetime.now()
-    return render_template("privacy.html", now=now)
+@app.route("/api/")
+def api_index():
+    # Track landing page view
+    page_view = PageView(
+        page="landing_page",
+        user_agent=request.headers.get('User-Agent'),
+        ip_address=request.remote_addr
+    )
+    db.session.add(page_view)
+    db.session.commit()
+    
+    poems = Poem.query.filter_by(approval_status="approved").order_by(Poem.timestamp.desc()).all() # type: ignore
+
+    # Get all categories with count of poems (only approved)
+    categories = [(c.category, c[1]) for c in db.session.query(
+        Poem.category, func.count(Poem.id) #type: ignore
+    ).filter(Poem.approval_status == "approved").group_by(Poem.category).all()]
+
+    # Top 5 for navbar
+    nav_categories = categories[:5]
+
+    # Build a mapping of category names to their respective images for use in the template
+    category_images = {}
+    for cat, _ in nav_categories:
+        if cat == "anxiety":
+            category_images[cat] = "static/img/POETRY/cat-anxiety.jpg"
+        elif cat == "romance":
+            category_images[cat] = "static/img/POETRY/cat-loving.jpg"
+        elif cat == "depression":
+            category_images[cat] = "static/img/POETRY/depression.jpg"
+        elif cat == "new_category":
+            category_images[cat] = request.form.get("thumbnail")
+        else:
+            category_images[cat] = "static/img/POETRY/to-love.jpeg"
+
+    return jsonify({
+        "poems": [poem.to_dict() for poem in poems],
+        "categories": categories,
+        "nav_categories": nav_categories,
+        "category_images": category_images
+    })
 
 
+# --- Additional API endpoints ---
 
+@app.route("/api/poems", methods=["GET"])
+def api_poems():
+    poems = Poem.query.filter_by(approval_status="approved").order_by(Poem.timestamp.desc()).all()
+    return jsonify({"poems": [p.to_dict() for p in poems]})
+
+@app.route("/api/poem/<int:poem_id>", methods=["GET"])
+def api_poem(poem_id):
+    poem = Poem.query.get_or_404(poem_id)
+    return jsonify({"poem": poem.to_dict()})
+
+@app.route("/api/categories", methods=["GET"])
+def api_categories():
+    categories = [(c.category, c[1]) for c in db.session.query(
+        Poem.category, func.count(Poem.id)
+    ).filter(Poem.approval_status == "approved").group_by(Poem.category).all()]
+    return jsonify({"categories": categories})
+
+@app.route("/api/category/<name>", methods=["GET"])
+def api_category(name):
+    poems = Poem.query.filter_by(category=name, approval_status="approved").order_by(Poem.timestamp.desc()).all()
+    return jsonify({"poems": [p.to_dict() for p in poems]})
 @app.route("/category/<name>", methods=["GET", "POST"])
 def category(name):
     poems = Poem.query.filter_by(category=name, approval_status="approved").order_by(Poem.timestamp.desc()).all()
@@ -463,53 +525,56 @@ def poem(poem_id, slug):
 # from passlib.hash import bcrypt, pbkdf2_sha256
 
 @app.route("/register", methods=["GET", "POST"])
+@app.route("/api/register", methods=["POST"])
 def register():
+    # support form submission and JSON API
     if request.method == "POST":
-        username = request.form.get("username")
-        email = request.form.get("email")
-        password = request.form.get("password")
-        first_name = request.form.get("first_name", "")
-        last_name = request.form.get("last_name", "")
-        id_number = request.form.get("id_number", "")
-        location = request.form.get("location", "")
-        art_field = request.form.get("art_field", "")
-        popia_consent = request.form.get("popia_consent") == "on"
-        terms_accepted = request.form.get("terms_accepted") == "on"
+        data = request.get_json(silent=True) or request.form
+        username = data.get("username")
+        email = data.get("email")
+        password = data.get("password")
+        id_number = data.get("id_number", "")
+        location = data.get("location", "")
+        art_field = data.get("art_field", "")
+        popia_consent = data.get("popia_consent") in ("on", True, "true", "True")
+        terms_accepted = data.get("terms_accepted") in ("on", True, "true", "True")
 
         # Basic validation
         if not username or not email or not password:
+            if request.is_json:
+                return jsonify({"success": False, "message": "Username, email, and password are required."}), 400
             flash("Username, email, and password are required!", "danger")
             return redirect(url_for("register"))
-        
         if not id_number:
+            if request.is_json:
+                return jsonify({"success": False, "message": "ID Number is required."}), 400
             flash("ID Number is required!", "danger")
             return redirect(url_for("register"))
-        
         if not terms_accepted:
+            if request.is_json:
+                return jsonify({"success": False, "message": "Terms must be accepted."}), 400
             flash("You must accept the Terms and Conditions!", "danger")
             return redirect(url_for("register"))
 
-        # Check if email already exists
         if User.query.filter_by(email=email).first():
+            if request.is_json:
+                return jsonify({"success": False, "message": "Email already exists."}), 409
             flash("Email already exists!", "warning")
             return redirect(url_for("register"))
 
-        # Create user and save to DB
         new_user = User(username=username, email=email, password=password, role="user")
         new_user.id_number = id_number
         new_user.location = location
         new_user.art_field = art_field
         new_user.popia_consent = popia_consent
         new_user.terms_accepted = terms_accepted
-        
-        print(f"Adding new user to database: USER TABLE")
+
         db.session.add(new_user)
         db.session.commit()
-        print(f"{new_user} Successfully added. Done")
 
-        # Log the user in
         login_user(new_user)
-        print(f"User {new_user} logged in successfully")
+        if request.is_json:
+            return jsonify({"success": True, "user": {"username": new_user.username, "email": new_user.email}})
         flash("Registration successful! Welcome to WaveZA.", "success")
         return redirect(url_for("dashboard"))
     return render_template("register.html")
@@ -526,49 +591,56 @@ def register():
 
 
 @app.route("/login", methods=["GET", "POST"])
+@app.route("/api/login", methods=["POST"])
 def login():
     if request.method == "POST":
-        username = request.form.get("username")
-        password = request.form.get("password")
-        print(f"Password from form: {password}")
-        print(f"Username from form: {username}")
+        data = request.get_json(silent=True) or request.form
+        username = data.get("username")
+        password = data.get("password")
 
         user = User.query.filter_by(username=username).first()
-        print(f"Username to query: {username}")
-
-        if user:
-            print(f"✅ User {user} found (password check skipped)")
+        if user and user.check_password(password):
             login_user(user)
-            print("✅ User logged in:", user.username)
-            flash("Login successful", "success") #Password check skipped
+            if request.is_json:
+                return jsonify({"success": True, "user": {"username": user.username, "email": user.email}})
+            flash("Login successful", "success")
             return redirect(url_for("dashboard"))
-        else:
-            print(f"❌ Login failed for:", username)
-            flash("Invalid credentials", "danger")
+        if request.is_json:
+            return jsonify({"success": False, "message": "Invalid credentials"}), 401
+        flash("Invalid credentials", "danger")
     return render_template("login.html")
 
 
 @app.route("/logout")
+@app.route("/api/logout")
 @login_required
 def logout():
     logout_user()
+    if request.path.startswith('/api'):
+        return jsonify({"success": True})
     return redirect(url_for("index"))
 
 @app.route("/dashboard")
+@app.route("/api/dashboard")
 @login_required
 def dashboard():
-    # Show all user's posts (pending and approved) for the user to see their own content
     poems = Poem.query.filter_by(author_id=current_user.id).order_by(Poem.submitted_at.desc()).all()
-    
-    # Count only approved for analytics
     approved_poems = [p for p in poems if p.approval_status == "approved"]
     pending_poems = [p for p in poems if p.approval_status == "pending"]
     rejected_poems = [p for p in poems if p.approval_status == "rejected"]
-    
     total_likes = sum(len(poem.likes) for poem in approved_poems)
     total_comments = sum(len(poem.comments) for poem in approved_poems)
     total_users = User.query.count()
-    
+    if request.path.startswith('/api'):
+        return jsonify({
+            "poems": [p.to_dict() for p in poems],
+            "total_poems": len(approved_poems),
+            "pending_poems": len(pending_poems),
+            "rejected_poems": len(rejected_poems),
+            "total_likes": total_likes,
+            "total_comments": total_comments,
+            "total_users": total_users
+        })
     return render_template("dashboard.html", 
                          poems=poems, 
                          total_poems=len(approved_poems),
@@ -603,9 +675,22 @@ def profile():
                          total_users=total_users)
 
 @app.route("/edit_profile", methods=["GET", "POST"])
+@app.route("/api/edit_profile", methods=["POST"])
 @login_required
 def edit_profile():
     if request.method == "POST":
+        data = request.get_json(silent=True)
+        if data:
+            # JSON update request
+            bio = data.get("bio", "").strip()
+            selected_categories = data.get("categories", [])
+            if not bio:
+                return jsonify({"success": False, "message": "Bio is required."}), 400
+            current_user.bio = bio
+            current_user.preferred_categories = ",".join(selected_categories)
+            db.session.commit()
+            return jsonify({"success": True, "user": {"username": current_user.username, "bio": current_user.bio}})
+        # fallback to form handling below
         bio = request.form.get("bio", "").strip()
         selected_categories = request.form.getlist("categories")  # Get all selected categories
         
@@ -929,6 +1014,38 @@ def add_poem():
         return redirect(url_for("dashboard"))
 
     return render_template("add_poem.html")
+
+
+# simple JSON-only version that accepts title/content/category
+@app.route("/api/poem", methods=["POST"])
+@login_required
+def api_add_poem():
+    data = request.get_json() or {}
+    title = data.get("title")
+    content = data.get("content")
+    category = data.get("category")
+    if not title or not content:
+        return jsonify({"success": False, "message": "Title and content required"}), 400
+    poem = Poem(
+        title=title,
+        content=content,
+        author=current_user,
+        category=category,
+    )
+    poem.excerpt = poem.get_excerpt(300)
+    # slug generation same as above
+    base_slug = slugify(title)
+    slug = base_slug
+    counter = 1
+    while Poem.query.filter_by(slug=slug).first():
+        slug = f"{base_slug}-{counter}"
+        counter += 1
+    poem.slug = slug
+    poem.approval_status = "pending"
+    db.session.add(poem)
+    db.session.commit()
+    return jsonify({"success": True, "poem": poem.to_dict()})
+
 
 
 

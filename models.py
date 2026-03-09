@@ -175,6 +175,23 @@ class Poem(db.Model):
     def __repr__(self):
         return f"<Poem {self.title}>"
     
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "content": self.content,
+            "timestamp": self.timestamp.isoformat() if self.timestamp else None,
+            "category": self.category,
+            "excerpt": self.excerpt,
+            "thumbnail": self.thumbnail,
+            "video_url": self.video_url,
+            "slug": self.slug,
+            "approval_status": self.approval_status,
+            "author": self.author.username if self.author else None,
+            "likes_count": len(self.likes),
+            "comments_count": len(self.comments)
+        }
+    
     def get_excerpt(self, length=300):
         """
         Generate a clean excerpt from HTML content.
