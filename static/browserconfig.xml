@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<browserconfig>
+    <msapplication>
+        <tile>
+            <square150x150logo src="/static/img/NEW/icons/android-chrome-512x512.png"/>
+            <TileColor>#1a1a2e</TileColor>
+        </tile>
+        <notification>
+            <polling-uri src="/notifications/notify"/>
+            <polling-uri2 src="/notifications/notify2"/>
+            <polling-frequency>30</polling-frequency>
+            <cycle>1</cycle>
+        </notification>
+    </msapplication>
+</browserconfig>

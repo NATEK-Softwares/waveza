@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row mb-4">
+                <h1 class="my-4 ml-3 text-primary">Admin Dashboard</h1>
+            </div>
+            
+            <!-- Row 1: Stats Cards (left) + Admin Menu (right) -->
+            <div class="row mb-4">
+                <!-- Stats Cards on Left -->
+                <div class="col-md-6">
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title text-primary">Registered Users</h5>
+                                    <h2 class="text-light">{{ total_users - 1 }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title text-primary">Total Posts</h5>
+                                    <h2 class="text-light">{{ total_posts }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3">
+                            <div class="card bg-warning text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title text-primary">Pending Approval</h5>
+                                    <h2 class="text-light">{{ pending_posts }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title text-primary">Granted Approval</h5>
+                                    <h2 class="text-light">{{ approved_posts }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <div class="card bg-danger text-white">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title text-primary">Rejected Posts</h5>
+                                    <h2 class="text-light">{{ rejected_posts }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Menu on Right -->
+                <div class="col-md-6 pt-3 card bg-dark text-white">
+                    <h4 class="mb-3 text-center border-bottom text-light pb-3">Admin Menu</h4>
+                    <div class="d-flex flex-column gap-2">
+                        <a href="{{ url_for('add_history_post') }}" class="btn btn-primary btn-lg w-50 my-3 mx-auto">Create History Post</a>
+                        <a href="{{ url_for('admin_posts', status='pending') }}" class="btn btn-warning btn-lg w-50 my-3 mx-auto">Review Posts</a>
+                        <a href="{{ url_for('admin_users') }}" class="btn btn-info btn-lg w-50 my-3 mx-auto">Manage Users</a>
+                        <a href="{{ url_for('admin_traffic') }}" class="btn btn-success btn-lg w-50 my-3 mx-auto">Traffic Analytics</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 2: Recent Pending Posts -->
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Recent Posts Awaiting Approval</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_pending %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Post Title</th>
+                                        <th>Author</th>
+                                        <th>Category</th>
+                                        <th>Submitted</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for post in recent_pending %}
+                                    <tr>
+                                        <td><strong>{{ post.title }}</strong></td>
+                                        <td><a href="{{ admin_user_profile }}"> {{ post.author.username }} </td>
+                                        <td><a href=" {{ url_for('categories') }} ">{{ post.category or 'Uncategorized' }}</a></td>
+                                        <td>{{ (post.submitted_at | localtime).strftime('%Y-%m-%d %H:%M') }}</td>
+                                        <td>
+                                            <a href="{{ url_for('admin_posts', status='pending') }}" class="btn btn-sm btn-warning rounded">Review</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No posts awaiting approval.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+{% endblock %}

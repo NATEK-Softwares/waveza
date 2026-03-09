@@ -1,15 +1,15 @@
 {% extends 'base.html' %}
-{% block title %}{{ poem.title }} - Poem{% endblock %}
+{% block title %}{{ poem.title }} - Artwork{% endblock %}
 
 {% block content %}
 <!-- Breadcrumb -->
-<div class="container-fluid mt-5">
+<div class="container-fluid mt-5 pt-4">
     <div class="row px-xl-5">
-        <div class="col-lg-6 mx-auto">
-            <nav class="breadcrumb bg-light d-flex flex-column mb-30 align-content-center">
-                <h2 class="px-auto mx-auto py-auto">{{ poem.title }}</h2>
+        <div class="col-lg-7 mx-auto">
+            <nav class="breadcrumb text-light d-flex flex-column mb-30 align-content-center" style="background: linear-gradient(135deg, rgba(62, 39, 35, 0.78) 0%, rgba(78, 46, 36, 0.75) 100%)">
+                <h2 class="px-auto text-primary mx-auto py-auto">{{ poem.title }}</h2>
                 <div class="mr-auto ml-auto">
-                    <small>This poem is from the <b>{{poem.category}}</b> category</small>
+                    <small>This artwork is from the <b>{{ poem.category.replace('-', ' ').title() }}</b> category</small>
                 </div>
             </nav>
         </div>
@@ -19,8 +19,8 @@
 <!-- Poem Detail -->
 <div class="container-fluid pb-5">
     <div class="row px-xl-5">
-        <div class="col-lg-6 mx-auto h-auto mb-30">
-            <div class="h-100 bg-light p-30" style="border: 2px double #1add13;">
+        <div class="col-lg-7 mx-auto h-auto mb-30">
+            <div class="h-100 p-30" style="border: 2px double #cbb6198d; background: linear-gradient(135deg, rgba(62, 39, 35, 0.78) 0%, rgba(78, 46, 36, 0.75) 100%)">
                 <div class="d-flex mb-3">
                     <div class="text-primary mr-2">
                         <!-- Example star ratings -->
@@ -34,27 +34,57 @@
                 </div>
                 <div class="mb-1 text-center w-100">
                     {% if poem.thumbnail %}
-                    <img src="{{ url_for('static', filename=poem.thumbnail) }}" alt="Poem-image" style="width: 100%;">
+                        <img src="{{ url_for('static', filename=poem.thumbnail) }}" alt="Poem-image" style="width: 100%;">
                     {% else %}
-                    <img src="{{ url_for('static', filename='uploads/Getty.jpg') }}" class="w-100" alt="Default Poem-image">
+                        <img src="{{ url_for('static', filename='img/painting.jpg') }}" class="w-100" alt="Default Poem-image">
                     {% endif %}
                     {% if poem.video_url %}
-                    <video loading="lazy" controls playsinline preload="metadata" controlsList="nodownload" style="width:100%; max-height:500px;" poster="{{ url_for('static', filename=poem.thumbnail) }}">
-                        <source src="{{ poem.video_url }}" type="video/mp4">
+                    <video loading="lazy" class="mt-4" controls playsinline preload="metadata" controlsList="nodownload" style="width:100%; max-height:500px;" poster="{{ url_for('static', filename=poem.thumbnail or 'img/painting.jpg') }}">
+                        {# Resolve source URL: external left as-is, local served via static endpoint #}
+                        {% if poem.video_url.startswith('http') or poem.video_url.startswith('//') %}
+                            {% set src = poem.video_url %}
+                        {% else %}
+                            {# Normalize stored path so url_for('static', ...) isn't given a leading 'static/' or '/'
+                               Accept values like 'uploads/videos/..', '/static/uploads/..', or 'static/uploads/..' #}
+                            {% set path = poem.video_url %}
+                            {% if path.startswith('/') %}
+                                {% set path = path.lstrip('/') %}
+                            {% endif %}
+                            {% if path.startswith('static/') %}
+                                {% set path = path[7:] %}
+                            {% endif %}
+                            {% set src = url_for('static', filename=path) %}
+                        {% endif %}
+
+                        {# Determine extension and set proper MIME type when possible #}
+                        {% set clean = src.split('?')[0] %}
+                        {% set ext = clean.split('.')[-1].lower() if '.' in clean else '' %}
+
+                        {% if ext in ['mp4', 'm4v'] %}
+                            <source src="{{ src }}" type="video/mp4">
+                        {% elif ext == 'webm' %}
+                            <source src="{{ src }}" type="video/webm">
+                        {% elif ext in ['mov', 'qt'] %}
+                            <source src="{{ src }}" type="video/quicktime">
+                        {% else %}
+                            <source src="{{ src }}">
+                        {% endif %}
+
+                        Your browser does not support the video tag or the video format.
                     </video>
                     {% else %}
                     <p class="text-muted mt-2">
-                        No video content has been added for this poem.
+                        No media content has been added for this artwork.
                     </p>
                     {% endif %}
                 </div>
-                <!-- <p>Thumbnail: {{ poem.thumbnail }} </p> -->
-                <div class="mb-4 text-dark" style="white-space: pre-line;">
+                <!--<p>Thumbnail: {{ poem.thumbnail }} </p>-->
+                <div class="mb-4 text-primary" style="white-space: pre-line;">
                     {{ poem.content | safe }}
                 </div>
                 <hr>
-                <p style="margin-bottom: -3px;">Author: <strong> <a href="{{ url_for('profile', username=poem.author.username) }}">{{ poem.author.username }}</a></strong></p>
-                <small class="text-muted">Date Posted: {{ poem.timestamp.strftime('%b %d, %Y') }}</small>
+                <p style="margin-bottom: -3px;" class="text-light">Posted By: <strong> <a href="{{ url_for('public_profile', username=poem.author.username) }}">{{ poem.author.username }}</a></strong></p>
+                <small class="text-success">Date Posted: {{ (poem.timestamp | localtime).strftime('%b %d, %Y') }}</small>
                 <div class="d-flex pt-2">
                     <form method="POST" action="{{ url_for('like_poem', poem_id=poem.id) }}">
                         <button type="submit" class="btn btn-outline-primary rounded">
@@ -69,20 +99,20 @@
     <!-- Comments Section -->
     <div class="row px-xl-5">
         <div class="col-lg-10 mx-auto">
-            <div class="bg-light p-30 rounded">
-                <h4 class="mb-4">Comments</h4>
+            <div class="p-30 rounded border border-primary" style="background: linear-gradient(135deg, rgba(62, 39, 35, 0.78) 0%, rgba(78, 46, 36, 0.75) 100%)">
+                <h4 class="mb-4 text-primary border-bottom border-primary p-2 rounded" style="background-color: #b5b2b2b4">Comments</h4>
                 {% for comment in poem.comments %}
                 <div class="mb-3 border-bottom pb-2">
-                    <strong>{{ comment.user.username }}</strong>
-                    <small class="text-muted">{{ comment.timestamp.strftime('%b %d, %Y') }}</small>
-                    <p class="mb-1 ml-4" style="white-space: pre-line;">{{ comment.content }}</p>
+                    <strong class="text-primary">{{ comment.user.username }}</strong>
+                    <small class="text-success">{{ (comment.timestamp | localtime).strftime('%b %d, %Y') }}</small>
+                    <p class="mb-1 ml-4 text-light" style="white-space: pre-line;">{{ comment.content }}</p>
                 </div>
                 {% endfor %}
 
                 {% if current_user.is_authenticated %}
                 <form method="POST" action="{{ url_for('add_comment', poem_id=poem.id) }}">
                     <div class="form-group">
-                        <textarea name="content" rows="3" class="form-control" placeholder="Leave a comment..."></textarea>
+                        <textarea name="content" rows="3" class="form-control" required placeholder="Leave a comment..."></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary mt-2 rounded">Post Comment</button>
                     <div class="btn-group mt-2">
@@ -93,33 +123,35 @@
                             <li>
                                 <a class="dropdown-item" 
                                 href="https://wa.me/?text={{ poem.title }}%0A{{ url_for('poem', slug=poem.slug, poem_id=poem.id, _external=True) }}" 
-                                target="_blank">
-                                📱 WhatsApp
+                                target="_blank"><span class="fab fa-whatsapp text-success display-5"></span>
+                                 WhatsApp
                                 </a>
                             </li>
                             <li>
                                 <a class="dropdown-item" 
                                 href="https://www.facebook.com/sharer/sharer.php?u={{ url_for('poem', slug=poem.slug, poem_id=poem.id, _external=True) }}" 
-                                target="_blank">
+                                target="_blank"><span class="fab fa-facebook text-info display-5"></span>
                                 📘 Facebook
                                 </a>
                             </li>
                             <li>
                                 <a class="dropdown-item" 
                                 href="https://twitter.com/intent/tweet?text={{ poem.title }}&url={{ url_for('poem', slug=poem.slug, poem_id=poem.id, _external=True) }}" 
-                                target="_blank">
-                                🐦 Twitter/X
+                                target="_blank"><span class="fab fa-twitter text-info display-5"></span>
+                                 Twitter/X
                                 </a>
                             </li>
                             <li>
                                 <a class="dropdown-item" 
                                 href="mailto:?subject={{ poem.title }}&body=Check out this poem: {{ url_for('poem', slug=poem.slug, poem_id=poem.id, _external=True) }}">
-                                ✉️ Email
+                                <span class="fas fa-envelope text-dark display-5"></span>
+                                Email
                                 </a>
                             </li>
                             <li>
                                 <button class="dropdown-item" onclick="copyPoemLink('{{ url_for('poem', slug=poem.slug, poem_id=poem.id, _external=True) }}')">
-                                    📋 Copy Link
+                                    <span class="fas fa-clipboard text-dark display-5"></span>
+                                     Copy Link
                                 </button>
                             </li>
                         </ul>

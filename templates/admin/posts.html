@@ -1,0 +1,401 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    body {
+        height: 100vh;
+    }
+
+    /* Post content formatting styles */
+    .post-content-display {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .post-content-display p {
+        margin-bottom: 12px;
+        color: #333;
+    }
+    
+    .post-content-display h1, 
+    .post-content-display h2, 
+    .post-content-display h3,
+    .post-content-display h4,
+    .post-content-display h5,
+    .post-content-display h6 {
+        color: #000;
+        margin-top: 15px;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+    
+    .post-content-display h1 { font-size: 24px; }
+    .post-content-display h2 { font-size: 20px; }
+    .post-content-display h3 { font-size: 18px; }
+    .post-content-display h4 { font-size: 16px; }
+    
+    .post-content-display ul, 
+    .post-content-display ol {
+        margin-left: 20px;
+        margin-bottom: 12px;
+        color: #333;
+    }
+    
+    .post-content-display li {
+        margin-bottom: 8px;
+        color: #333;
+    }
+    
+    .post-content-display a {
+        color: #007bff;
+        text-decoration: none;
+    }
+    
+    .post-content-display a:hover {
+        text-decoration: underline;
+    }
+    
+    .post-content-display strong, 
+    .post-content-display b {
+        font-weight: 600;
+        color: #000;
+    }
+    
+    .post-content-display em, 
+    .post-content-display i {
+        font-style: italic;
+        color: #666;
+    }
+    
+    .post-content-display blockquote {
+        border-left: 4px solid #ddd;
+        padding-left: 15px;
+        margin-left: 0;
+        margin-bottom: 12px;
+        color: #666;
+        font-style: italic;
+    }
+    
+    .post-content-display code {
+        background-color: #f4f4f4;
+        color: #d63384;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-family: 'Courier New', monospace;
+        font-size: 13px;
+    }
+    
+    .post-content-display pre {
+        background-color: #f4f4f4;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 12px;
+        margin-bottom: 12px;
+        overflow-x: auto;
+        color: #333;
+    }
+    
+    .post-content-display pre code {
+        background: none;
+        color: #333;
+        padding: 0;
+    }
+    
+    .post-content-display img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 4px;
+        margin: 12px 0;
+    }
+    
+    .post-content-display hr {
+        border: none;
+        border-top: 1px solid #ddd;
+        margin: 20px 0;
+    }
+    
+    .post-content-display table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 12px;
+    }
+    
+    .post-content-display table th,
+    .post-content-display table td {
+        border: 1px solid #ddd;
+        padding: 8px 12px;
+        text-align: left;
+    }
+    
+    .post-content-display table th {
+        background-color: #f4f4f4;
+        font-weight: 600;
+        color: #000;
+    }
+    
+    .post-content-display table tr:nth-child(even) {
+        background-color: #fafafa;
+    }
+</style>
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-12 mt-5">
+            <h1 class="mb-4 text-primary">Post Review Management</h1>
+            
+            <!-- Status Tabs -->
+            <div class="mb-4">
+                <a href="{{ url_for('admin_posts', status='pending') }}" class="btn {% if status == 'pending' %}btn-warning{% else %}btn-outline-warning{% endif %} me-2 rounded">Pending ({{ pending_count|default(0) }})</a>
+                <a href="{{ url_for('admin_posts', status='approved') }}" class="btn {% if status == 'approved' %}btn-success{% else %}btn-outline-success{% endif %} me-2 rounded">Approved ({{ approved_count|default(0) }})</a>
+                <a href="{{ url_for('admin_posts', status='rejected') }}" class="btn {% if status == 'rejected' %}btn-danger{% else %}btn-outline-danger{% endif %} rounded">Rejected ({{ rejected_count|default(0) }})</a>
+            </div>
+
+            <!-- Posts Table -->
+            {% if posts.items %}
+                <div class="table-responsive">
+                    <table class="table table-hover text-light" style="background-color: #f8f9fa88">
+                        <thead style="background-color: #dbd8d8ff">
+                            <tr>
+                                <th class="border-right">Title</th>
+                                <th class="border-right">Author</th>
+                                <th class="border-right">Category</th>
+                                <th class="border-right">Submitted</th>
+                                <th class="border-right">Status</th>
+                                <th class="border-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for post in posts.items %}
+                            <tr class="border-bottom">
+                                <td class="border-right">
+                                    <strong>{{ post.title }}</strong>
+                                </td>
+                                <td class="border-right">
+                                    <a href="{{ url_for('admin_user_profile', user_id=post.author_id) }}" class="text-primary">{{ post.author.username }}</a>
+                                </td>
+                                <td class="border-right">{{ post.category or 'Uncategorized' }}</td>
+                                <td class="border-right">{{ (post.submitted_at | localtime).strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td class="border-right">
+                                    {% if post.approval_status == 'pending' %}
+                                        <span class="badge bg-warning">Pending</span>
+                                    {% elif post.approval_status == 'approved' %}
+                                        <span class="badge bg-success">Approved</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Rejected</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary rounded" data-bs-toggle="modal" data-bs-target="#postModal{{ post.id }}">
+                                        View
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <!-- Post Modal -->
+                            <div class="modal fade" id="postModal{{ post.id }}" tabindex="-1" aria-labelledby="postModalLabel{{ post.id }}" aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content" style="color: #000; background-color: #fff;">
+                                        <div class="modal-header" style="background-color: #f8f9fa; border-bottom: 1px solid #dee2e6;">
+                                            <h5 class="modal-title" id="postModalLabel{{ post.id }}" style="color: #000;">{{ post.title }}</h5>
+                                            <button type="button" class="btn-close rounded" data-bs-dismiss="modal" aria-label="Close"> <span class="fas fa-times"></span> </button>
+                                        </div>
+                                        <div class="modal-body" style="color: #333; max-height: 70vh; overflow-y: auto; display: block !important; visibility: visible !important;">
+                                            <div style="color: #000; margin-bottom: 10px;">
+                                                <strong>Author:</strong> <a href="{{ url_for('public_profile', username=post.author.username) }}">{{ post.author.username }}</a>
+                                            </div>
+                                            <div style="color: #000; margin-bottom: 10px;">
+                                                <strong>Category:</strong> {{ post.category or 'Uncategorized' }}
+                                            </div>
+                                            <div style="color: #000; margin-bottom: 15px;">
+                                                <strong>Submitted:</strong> {{ (post.submitted_at | localtime).strftime('%Y-%m-%d %H:%M') }}
+                                            </div>
+                                            <hr style="color: #ddd; margin: 15px 0;">
+                                            <div class="post-content-display" style="color: #333; background-color: #f9f9f9; padding: 20px; border-radius: 5px; border-left: 4px solid #007bff; word-wrap: break-word; line-height: 1.6; font-size: 15px;">
+                                                {% if post.content %}
+                                                    {{ post.content|safe }}
+                                                {% else %}
+                                                    <em style="color: #999;">No content available</em>
+                                                {% endif %}
+                                            </div>
+                                            {% if post.admin_review_comments %}
+                                            <hr style="color: #ddd; margin: 15px 0;">
+                                            <div style="color: #000; margin-bottom: 10px;">
+                                                <strong>Admin Comments:</strong>
+                                            </div>
+                                            <div style="color: #666; background-color: #f0f0f0; padding: 10px; border-radius: 3px;">{{ post.admin_review_comments }}</div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="modal-footer">
+                                            {% if post.approval_status == 'pending' %}
+                                                <form method="POST" action="{{ url_for('approve_post', poem_id=post.id) }}" style="display:inline;">
+                                                    <button type="submit" class="btn btn-success">Approve</button>
+                                                </form>
+                                                <!-- Use JS handler to hide parent then show reject modal to avoid nested-modal focus/backdrop issues -->
+                                                <button type="button" class="btn btn-danger open-reject" data-reject-target="rejectModal{{ post.id }}" data-parent="#postModal{{ post.id }}">Reject</button>
+                                            {% endif %}
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Reject Modal -->
+                            <div class="modal fade" id="rejectModal{{ post.id }}" tabindex="-1" aria-labelledby="rejectModalLabel{{ post.id }}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="rejectModalLabel{{ post.id }}">Reject Post</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"><span class="fas fa-close"></span></button>
+                                        </div>
+                                        <form method="POST" action="{{ url_for('reject_post', poem_id=post.id) }}">
+                                            <div class="modal-body" style="display:block !important; visibility:visible !important; color:#000;">
+                                                <label for="comments_{{ post.id }}" class="form-label">Review Comments (optional):</label>
+                                                <textarea class="form-control" id="comments_{{ post.id }}" name="comments" rows="5" placeholder="Explain why this post is being rejected..."></textarea>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="submit" class="btn btn-danger">Reject Post</button>
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                {% if posts.pages > 1 %}
+                <nav>
+                    <ul class="pagination">
+                        {% if posts.has_prev %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('admin_posts', status=status, page=posts.prev_num) }}">Previous</a>
+                        </li>
+                        {% endif %}
+                        
+                        {% for page_num in posts.iter_pages() %}
+                            {% if page_num %}
+                                {% if page_num == posts.page %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ page_num }}</span>
+                                </li>
+                                {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('admin_posts', status=status, page=page_num) }}">{{ page_num }}</a>
+                                </li>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if posts.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('admin_posts', status=status, page=posts.next_num) }}">Next</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-info">No posts with to display.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Reject modal handler: delegation and diagnostics
+console.log('posts: reject script loaded');
+document.addEventListener('DOMContentLoaded', function(){
+    var buttons = document.querySelectorAll('.open-reject');
+    console.log('posts: found open-reject buttons:', buttons.length);
+
+    // Delegation: handle clicks even if inner elements are clicked
+    document.addEventListener('click', function(ev){
+        var btn = ev.target.closest && ev.target.closest('.open-reject');
+        if(!btn) return;
+        console.log('posts: open-reject clicked', btn);
+        ev.preventDefault();
+        var targetId = btn.getAttribute('data-reject-target');
+        var parentSelector = btn.getAttribute('data-parent');
+        var parent = parentSelector ? document.querySelector(parentSelector) : null;
+        var target = document.getElementById(targetId);
+
+        console.log('posts: targetId', targetId, 'parent', parentSelector, parent, 'targetElem', target);
+
+        if(parent){
+            var parentInst = null;
+            try{
+                // Prefer getInstance if available (Bootstrap 5+), otherwise create an instance safely
+                if (window.bootstrap && bootstrap.Modal) {
+                    if (typeof bootstrap.Modal.getInstance === 'function') {
+                        parentInst = bootstrap.Modal.getInstance(parent) || new bootstrap.Modal(parent);
+                    } else {
+                        // getInstance not available (older or conflicting Bootstrap); try creating instance
+                        try { parentInst = new bootstrap.Modal(parent); } catch(e){ parentInst = null; }
+                    }
+                }
+            }catch(err){ console.warn('posts: bootstrap parent instance error', err); parentInst = null; }
+
+            var onHidden = function(){
+                try{
+                    if(target){
+                        // show target using best available method
+                        try{
+                            if(window.bootstrap && bootstrap.Modal){ try{ new bootstrap.Modal(target).show(); }catch(e){ throw e; } }
+                        }catch(e){
+                            if (window.jQuery && $(target).modal) { try{ $(target).modal('show'); }catch(e){ console.warn('posts: jQuery show failed', e); }
+                            } else {
+                                // manual fallback: add show class and inline styles
+                                try{ target.classList.add('show'); target.style.display = 'block'; target.setAttribute('aria-modal','true'); target.removeAttribute('aria-hidden');
+                                    // backdrop
+                                    var back = document.createElement('div'); back.className = 'modal-backdrop fade show'; document.body.appendChild(back);
+                                }catch(err){ console.error('posts: manual show failed', err); }
+                            }
+                        }
+
+                        var ta = target.querySelector('textarea');
+                        if(ta){ setTimeout(function(){ try{ ta.focus(); console.log('posts: textarea focused'); }catch(e){} }, 60); }
+                    }
+                }catch(e){ console.error('posts: show target error', e); }
+                // unregister both possible handlers
+                try{ parent.removeEventListener('hidden.bs.modal', onHidden); }catch(e){}
+                try{ if(window.jQuery && $(parent).off) $(parent).off('hidden.bs.modal', onHidden); }catch(e){}
+            };
+
+            // register hidden handler via jQuery if available, else DOM
+            try{
+                if(window.jQuery && $(parent).on){ $(parent).one('hidden.bs.modal', onHidden); }
+                else { parent.addEventListener('hidden.bs.modal', onHidden); }
+            }catch(e){ try{ parent.addEventListener('hidden.bs.modal', onHidden); }catch(err){}
+            }
+
+            // Hide parent using the best available method
+            try{
+                if(parentInst && typeof parentInst.hide === 'function') {
+                    parentInst.hide();
+                } else if (window.jQuery && $(parent).modal) {
+                    try{ $(parent).modal('hide'); }catch(e){
+                        parent.classList.remove('show'); parent.style.display = 'none'; parent.setAttribute('aria-hidden','true');
+                    }
+                } else {
+                    // manual hide
+                    parent.classList.remove('show'); parent.style.display = 'none'; parent.setAttribute('aria-hidden','true');
+                    // remove any backdrop
+                    var existing = document.querySelectorAll('.modal-backdrop'); existing.forEach(function(b){ b.parentNode.removeChild(b); });
+                    // call onHidden immediately since no event will fire
+                    setTimeout(onHidden, 50);
+                }
+            } catch(e){ console.warn('posts: hide parent failed, fallback', e); setTimeout(function(){ if(target){ try{ new bootstrap.Modal(target).show(); }catch(e){ if(window.jQuery && $(target).modal) try{ $(target).modal('show'); }catch(e){} } } }, 100); }
+        } else {
+            try{ if(target) new bootstrap.Modal(target).show(); }
+            catch(e){
+                try{ if(window.jQuery && $(target).modal) $(target).modal('show'); else console.error('posts: direct show target failed', e); }catch(err){ console.error('posts: direct show fallback failed', err); }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

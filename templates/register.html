@@ -1,10 +1,10 @@
 <!-- register.html -->
 {% extends 'base.html' %}
-{% block title %}Poems | Register{% endblock %}
+{% block title %}Register | WaveZA{% endblock %}
 {% block content %}
-<div class="auth-wrapper">
-    <div class="auth-card">
-    <h3 class="text-center mb-4">Create Account</h3>
+<div class="auth-wrapper my-5 py-4" style="background: linear-gradient(135deg, rgba(62, 39, 35, 0.78) 0%, rgba(78, 46, 36, 0.75) 100%)">
+    <div class="auth-card col-md-6" style="background: linear-gradient(135deg, rgba(184, 179, 179, 0.89) 0%, rgba(215, 73, 29, 0.75) 100%)">
+        <h3 class="text-center text-primary mb-4">Create Account - WaveZA</h3>
 
         <!-- Flash messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -15,35 +15,106 @@
             {% endif %}
         {% endwith %}
 
-        <form method="POST" action="{{ url_for('register') }}">
+        <form method="POST" action="{{ url_for('register') }}" id="registerForm" class="text-light">
+            <hr>
+            <h5>Personal Details</h5> 
+            <p>
+                <span class="text-danger">*</span> <i>indicates required field</i>
+            </p>
+            
             <div class="form-group mb-3">
-                <label for="username">Username</label>
+                <label for="username">Username <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" id="username" name="username" required>
             </div>
+
             <div class="form-group mb-3">
-                <label for="email">Email</label>
+                <label for="email">Email <span class="text-danger">*</span></label>
                 <input type="email" class="form-control" id="email" name="email" required>
             </div>
+
             <div class="form-group mb-3">
-                <label for="password">Password</label>
+                <label for="password">Password <span class="text-danger">*</span></label>
                 <div class="password-input-wrapper">
-                    <input type="password" class="form-control" id="password" name="password">
+                    <input type="password" class="form-control" id="password" name="password" required>
                     <button type="button" class="password-toggle" id="passwordToggle" onclick="togglePasswordVisibility('password')">
-                        <i class="bi bi-eye" style="color: #000000; font-weight: 600;"></i>
+                        <i class="fas fa-eye" style="color: #000000; font-weight: 600;"></i>
                     </button>
                 </div>
             </div>
-            <div class="form-group mb-4">
-                <label for="role">Register As</label>
-                <select id="role" name="role" class="form-control" required>
-                    <option value="">--Choose Account Type--</option>
-                    <option value="writer">Writer</option>
-                    <option value="reader">Reader</option>
+            <div class="form-group mb-3">
+                <label for="password">Confirm Password <span class="text-danger">*</span></label>
+                <div class="password-input-wrapper">
+                    <input type="password" class="form-control" id="password" name="password" required>
+                    <button type="button" class="password-toggle" id="passwordToggle" onclick="togglePasswordVisibility('password')">
+                        <i class="fas fa-eye" style="color: #000000; font-weight: 600;"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="id_number">ID Number <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="id_number" name="id_number" placeholder="National ID or Passport Number" required>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="location">Location</label>
+                <input type="text" class="form-control" id="location" name="location" placeholder="City, Province or Country">
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="art_field">Art Field</label>
+                <select id="art_field" name="art_field" class="form-control">
+                    <option value="">-- Select Your Primary Art Field --</option>
+                    <option value="music">Music</option>
+                    <option value="visual_arts">Visual Arts</option>
+                    <option value="painting">Painting</option>
+                    <option value="sculpture">Sculpture</option>
+                    <option value="dance">Dance</option>
+                    <option value="dramatic_arts">Dramatic Arts</option>
+                    <option value="theatre">Theatre</option>
+                    <option value="film">Film & Video</option>
+                    <option value="comedy">Comedy/Skits</option>
+                    <option value="written_art">Written Art</option>
+                    <option value="poetry">Poetry</option>
+                    <option value="short_stories">Short Stories</option>
+                    <option value="novels">Novels</option>
+                    <option value="fiction">Fiction</option>
+                    <option value="non_fiction">Non-Fiction</option>
+                    <option value="other">Other</option>
                 </select>
             </div>
+
+            <hr>
+            <h5>Policies & Agreements</h5>
+
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="popia_consent" name="popia_consent" value="on">
+                <label class="form-check-label" for="popia_consent">
+                    I consent to allow the Department of Arts and Culture to share my work and/or personal details if necessary
+                </label>
+                <small class="form-text text-muted d-block mt-2 bg-light p-3 rounded">
+                    <strong>POPIA Notice:</strong> Your personal information will be handled in accordance with the Protection of Personal Information Act (POPIA) of South Africa.
+                </small>
+            </div>
+
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="terms_accepted" name="terms_accepted" value="on" required>
+                <label class="form-check-label" for="terms_accepted">
+                    I accept the Terms and Conditions <span class="text-danger">*</span>
+                </label>
+            </div>
+
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="terms_accepted" name="terms_accepted" value="on" required>
+                <label class="form-check-label" for="terms_accepted">
+                    I consent to the <a href="{{ url_for('privacy') }}" class="text-primary">Privacy Policy</a> <span class="text-danger">*</span>
+                </label>
+            </div>
+
+
             <button type="submit" class="btn btn-primary w-100">Register</button>
         </form>
-    <p class="text-center mt-3">Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
+        <p class="text-center mt-3">Already have an account? <a href="{{ url_for('login') }}" class="text-primary">Login</a></p>
     </div>
 </div>
 

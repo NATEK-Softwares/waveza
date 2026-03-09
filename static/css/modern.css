@@ -1,27 +1,27 @@
-/* Modern Poetry App - Light Gradient Theme */
+/* Modern Poetry App - Africa-Inspired Theme */
 
 :root {
-  /* Modern light gradient colors */
-  --primary-light: #F8FAFB;
-  --primary-pale: #F0F4F9;
-  --primary-accent: #E8EEF7;
-  --secondary-accent: #DDE5F0;
+  /* Africa-inspired warm earth tones */
+  --primary-light: #F5E6D3;
+  --primary-pale: #FBF6F0;
+  --primary-accent: #E8D7C3;
+  --secondary-accent: #D4C5B5;
   
-  /* Gradient stops */
-  --gradient-primary: linear-gradient(135deg, #F8FAFB 0%, #F0F4F9 50%, #E8EEF7 100%);
-  --gradient-soft: linear-gradient(135deg, #ffffff 0%, #F8FAFB 50%, #F0F4F9 100%);
-  --gradient-accent: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+  /* Africa-inspired gradients: warm ochre to rich gold */
+  --gradient-primary: linear-gradient(135deg, #F5E6D3 0%, #FBF6F0 50%, #E8D7C3 100%);
+  --gradient-soft: linear-gradient(135deg, #FFF9F5 0%, #F5E6D3 50%, #E8D7C3 100%);
+  --gradient-accent: linear-gradient(135deg, #D4941E 0%, #C88C00 100%);
   
-  /* Soft colors for text and accents */
-  --text-dark: #2D3748;
-  --text-secondary: #4A5568;
-  --text-light: #718096;
+  /* Africa-inspired text colors: deep browns */
+  --text-dark: #3E2723;
+  --text-secondary: #5D4037;
+  --text-light: #795548;
   
-  /* Accent colors - modern palette */
-  --accent-purple: #667EEA;
-  --accent-pink: #F687B3;
-  --accent-teal: #48B6C4;
-  --accent-coral: #F78E8A;
+  /* Africa-inspired accent colors: terracotta, gold, warm tones */
+  --accent-purple: #B8731B;
+  --accent-pink: #D87D5E;
+  --accent-teal: #8B6914;
+  --accent-coral: #E8936B;
   
   /* Shadows */
   --shadow-sm: 0 2px 8px rgba(45, 55, 72, 0.08);
@@ -36,22 +36,40 @@
 }
 
 /* Base styles */
+html {
+  height: 100%;
+}
+
 body {
-  background: var(--gradient-primary) !important;
+  background-image: linear-gradient(rgba(11, 22, 30, 0.684), rgba(11, 22, 30, 0.704)), url('../img/Baobab.jpg');
+  background-size: cover;
+  background-position: top;
+  background-repeat: no-repeat;
+  background-color: var(--primary-light);
   background-attachment: fixed;
   color: var(--text-dark);
   font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
 }
 
 /* Modern Navbar */
 .navbar-modern {
-  background: linear-gradient(180deg, #ffffff 0%, #F8FAFB 100%);
+  /* Background image with semi-transparent overlay for readability */
+  background-image: linear-gradient(rgba(11, 22, 30, 0.659), rgba(97, 102, 106, 0.755)), url('../img/tradition.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   box-shadow: var(--shadow-md);
-  border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+  border-bottom: 1px solid rgba(102, 126, 234, 0.12);
   padding: 0.75rem 0 !important;
-  backdrop-filter: blur(10px);
-  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(6px);
+  color: #ffffff;
 }
 
 .navbar-modern .navbar-brand {
@@ -66,7 +84,7 @@ body {
 }
 
 .navbar-modern .nav-link {
-  color: var(--text-secondary) !important;
+  color: rgba(255,255,255,0.95) !important;
   font-weight: 500;
   font-size: 0.95rem;
   padding: 0.5rem 1rem !important;
@@ -165,33 +183,39 @@ body {
   box-shadow: 0 6px 20px rgba(247, 142, 138, 0.3);
 }
 
-/* Cards and containers */
+/* Cards and containers - Modern Africa-inspired dark theme with glassmorphism */
 .card-modern {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 251, 0.9));
-  border: 1px solid rgba(102, 126, 234, 0.1);
+  background: linear-gradient(135deg, rgba(62, 39, 35, 0.75) 0%, rgba(93, 64, 55, 0.72) 100%);
+  border: 1px solid rgba(212, 148, 30, 0.3);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.1);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  color: #FBF6F0;
 }
 
 .card-modern:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
-  border-color: rgba(102, 126, 234, 0.2);
+  transform: translateY(-6px);
+  box-shadow: 0 12px 40px rgba(212, 148, 30, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  border-color: rgba(212, 148, 30, 0.5);
+  background: linear-gradient(135deg, rgba(62, 39, 35, 0.85) 0%, rgba(93, 64, 55, 0.82) 100%);
 }
 
-/* Poem cards */
+/* Poem cards - Modern dark glassmorphism */
 .poem-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 244, 249, 0.9));
-  border: 1px solid rgba(102, 126, 234, 0.12);
+  background: linear-gradient(135deg, rgba(62, 39, 35, 0.78) 0%, rgba(78, 46, 36, 0.75) 100%);
+  border: 1px solid rgba(212, 148, 30, 0.28);
   border-radius: var(--radius-lg);
   padding: 1.5rem;
   margin-bottom: 1.5rem;
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(212, 148, 30, 0.12);
   transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
   position: relative;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  color: #FBF6F0;
 }
 
 .poem-card::before {
@@ -207,9 +231,10 @@ body {
 }
 
 .poem-card:hover {
-  transform: translateY(-6px);
-  box-shadow: var(--shadow-lg);
-  border-color: rgba(102, 126, 234, 0.2);
+  transform: translateY(-8px);
+  box-shadow: 0 12px 40px rgba(212, 148, 30, 0.25), inset 0 1px 1px rgba(212, 148, 30, 0.2);
+  border-color: rgba(212, 148, 30, 0.45);
+  background: linear-gradient(135deg, rgba(62, 39, 35, 0.88) 0%, rgba(78, 46, 36, 0.85) 100%);
 }
 
 .poem-card:hover::before {
@@ -243,15 +268,15 @@ body {
 }
 
 .btn-secondary-modern {
-  background: linear-gradient(135deg, #E8EEF7 0%, #DDE5F0 100%);
+  background: linear-gradient(135deg, #E8D7C3 0%, #D4C5B5 100%);
   color: var(--accent-purple);
-  border: 1px solid rgba(102, 126, 234, 0.2);
+  border: 1px solid rgba(184, 115, 27, 0.2);
 }
 
 .btn-secondary-modern:hover {
-  background: linear-gradient(135deg, #DDE5F0 0%, #D0D8EC 100%);
+  background: linear-gradient(135deg, #D4C5B5 0%, #C5B5A5 100%);
   color: var(--accent-purple);
-  border-color: rgba(102, 126, 234, 0.3);
+  border-color: rgba(184, 115, 27, 0.3);
   text-decoration: none;
 }
 
@@ -262,43 +287,46 @@ body {
 }
 
 .btn-outline-modern:hover {
-  background: rgba(102, 126, 234, 0.08);
+  background: rgba(184, 115, 27, 0.08);
   border-color: var(--accent-purple);
   color: var(--accent-purple);
   text-decoration: none;
 }
 
-/* Input fields */
+/* Input fields - Modern dark glassmorphism */
 .form-control-modern {
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(102, 126, 234, 0.2);
+  background: rgba(62, 39, 35, 0.65);
+  border: 1px solid rgba(212, 148, 30, 0.25);
   border-radius: var(--radius-md);
   padding: 0.75rem 1rem;
-  color: var(--text-dark);
+  color: #FBF6F0;
   transition: all 0.3s ease;
-  box-shadow: var(--shadow-sm);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3), 0 4px 12px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .form-control-modern:focus {
-  background: rgba(255, 255, 255, 0.95);
-  border-color: var(--accent-purple);
-  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.1);
+  background: rgba(62, 39, 35, 0.8);
+  border-color: rgba(212, 148, 30, 0.6);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 0 0.2rem rgba(212, 148, 30, 0.2);
   outline: none;
+  color: #FBF6F0;
 }
 
 .form-control-modern::placeholder {
-  color: var(--text-light);
+  color: rgba(251, 246, 240, 0.5);
 }
 
 /* Badges and tags */
 .badge-modern {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(246, 135, 179, 0.1));
+  background: linear-gradient(135deg, rgba(212, 148, 30, 0.12), rgba(232, 143, 107, 0.12));
   color: var(--accent-purple);
   border-radius: var(--radius-sm);
   padding: 0.4rem 0.8rem;
   font-size: 0.85rem;
   font-weight: 600;
-  border: 1px solid rgba(102, 126, 234, 0.2);
+  border: 1px solid rgba(212, 148, 30, 0.25);
 }
 
 /* Section headings */
@@ -324,21 +352,27 @@ body {
 
 /* Footer */
 .footer-modern {
-  background: linear-gradient(180deg, #e0e8ff 0%, #13435c 100%);
-  /* border-top: 1px solid rgba(102, 126, 234, 0.1); */
-  color: var(--text-secondary);
+  /* Use same hero image as navbar with a darker overlay for contrast */
+  background-image: linear-gradient(rgba(14, 15, 16, 0.745), rgb(6, 10, 15)), url('../img/tradition.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: rgba(255,255,255,0.92);
   padding: 2rem 0;
+  position: relative;
+  border-top: 1px solid rgba(255,255,255,0.06);
 }
 
 .footer-modern a {
-  color: var(--accent-purple);
+  color: rgba(255,255,255,0.95);
   text-decoration: none;
-  transition: color 0.3s ease;
+  transition: color 0.25s ease, transform 0.25s ease;
 }
 
 .footer-modern a:hover {
   color: var(--accent-teal);
   text-decoration: underline;
+  transform: translateY(-2px);
 }
 
 /* Links */
@@ -423,12 +457,15 @@ a:hover {
   box-shadow: var(--shadow-md) !important;
 }
 
-/* Override Bootstrap defaults for consistency */
+/* Override Bootstrap defaults for consistency - Africa-inspired dark theme */
 .card {
-  border: 1px solid rgba(102, 126, 234, 0.1);
+  border: 1px solid rgba(212, 148, 30, 0.28);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 251, 0.9));
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+  background: linear-gradient(135deg, rgba(62, 39, 35, 0.75) 0%, rgba(93, 64, 55, 0.72) 100%);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  color: #FBF6F0;
 }
 
 .btn {
@@ -439,13 +476,18 @@ a:hover {
 
 .form-control {
   border-radius: var(--radius-md);
-  border: 1px solid rgba(102, 126, 234, 0.2);
-  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(212, 148, 30, 0.25);
+  background: rgba(62, 39, 35, 0.65);
+  color: #FBF6F0;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .form-control:focus {
-  border-color: var(--accent-purple);
-  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.1);
+  border-color: rgba(212, 148, 30, 0.6);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 0 0.2rem rgba(212, 148, 30, 0.2);
+  background: rgba(62, 39, 35, 0.8);
+  color: #FBF6F0;
 }
 
 /* Main content area */
@@ -461,6 +503,184 @@ main {
 
 ::-webkit-scrollbar-track {
   background: rgba(240, 244, 249, 0.5);
+}
+
+/* FAQ Accordion Styling - Modern dark Africa-inspired */
+.privacy-policy-container {
+  background: linear-gradient(135deg, rgba(62, 39, 35, 0.8) 0%, rgba(78, 46, 36, 0.78) 100%);
+  border: 1px solid rgba(212, 148, 30, 0.28);
+  border-radius: var(--radius-lg);
+  padding: 3rem;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(212, 148, 30, 0.12);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  margin-left: auto;
+  margin-right: auto;
+  color: #FBF6F0;
+}
+
+.privacy-policy-container h1 {
+  color: var(--text-dark);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-teal) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.privacy-policy-container h2 {
+  color: var(--text-dark);
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid rgba(102, 126, 234, 0.15);
+  padding-bottom: 0.75rem;
+}
+
+.privacy-policy-container section {
+  margin-bottom: 2.5rem;
+}
+
+.privacy-policy-container ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.privacy-policy-container li {
+  padding: 0.75rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+  color: rgba(251, 246, 240, 0.88);
+  line-height: 1.6;
+}
+
+.privacy-policy-container li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--accent-teal);
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+/* FAQ Section */
+.FAQ-dropdown {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(72, 182, 196, 0.05) 100%);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+  margin-top: 3rem;
+  border: 1px solid rgba(102, 126, 234, 0.15);
+}
+
+.FAQ-dropdown h2 {
+  color: var(--accent-purple);
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 1.75rem;
+  border-bottom: none;
+  padding-bottom: 0;
+  position: relative;
+}
+
+.FAQ-dropdown h2::after {
+  content: "";
+  display: block;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent-purple), var(--accent-teal));
+  margin: 0.75rem auto 0;
+  border-radius: 2px;
+}
+
+/* Accordion Items */
+.accordion {
+  border: none;
+}
+
+.accordion-item {
+  background: rgba(62, 39, 35, 0.6);
+  border: 1px solid rgba(212, 148, 30, 0.25);
+  border-radius: var(--radius-md);
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.accordion-item:hover {
+  border-color: rgba(212, 148, 30, 0.5);
+  box-shadow: 0 4px 12px rgba(212, 148, 30, 0.15), inset 0 1px 1px rgba(212, 148, 30, 0.08);
+  transform: translateY(-2px);
+  background: rgba(62, 39, 35, 0.7);
+}
+
+.accordion-button {
+  background: transparent;
+  color: #FBF6F0;
+  font-weight: 600;
+  padding: 1.25rem 1.5rem;
+  border: none;
+  text-align: left;
+  position: relative;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.accordion-button:not(.collapsed) {
+  background: linear-gradient(135deg, rgba(212, 148, 30, 0.15) 0%, rgba(184, 115, 27, 0.12) 100%);
+  color: rgba(212, 148, 30, 0.95);
+  box-shadow: none;
+}
+
+.accordion-button::after {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23D4941E'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+  transform: none;
+  transition: transform 0.3s ease;
+}
+
+.accordion-button:not(.collapsed)::after {
+  transform: rotate(0deg);
+}
+
+.accordion-button:focus {
+  border-color: rgba(212, 148, 30, 0.5);
+  box-shadow: 0 0 0 0.25rem rgba(212, 148, 30, 0.15);
+  background: transparent;
+}
+
+.accordion-body {
+  padding: 1.25rem 1.5rem;
+  color: rgba(251, 246, 240, 0.92);
+  line-height: 1.7;
+  border-top: 1px solid rgba(212, 148, 30, 0.15);
+  font-size: 0.95rem;
+}
+  color: var(--text-secondary);
+  line-height: 1.7;
+  border-top: 1px solid rgba(102, 126, 234, 0.1);
+  font-size: 0.95rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .privacy-policy-container {
+    padding: 2rem 1.5rem;
+  }
+  
+  .FAQ-dropdown {
+    padding: 1.5rem;
+    margin-top: 2rem;
+  }
+  
+  .accordion-button {
+    padding: 1rem 1.25rem;
+    font-size: 0.95rem;
+  }
+  
+  .accordion-body {
+    padding: 1rem 1.25rem;
+  }
 }
 
 ::-webkit-scrollbar-thumb {

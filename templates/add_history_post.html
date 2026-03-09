@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% block title %}Create History Post{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm mt-5">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Create History Post</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('add_history_post') }}" enctype="multipart/form-data">
+                        <div class="form-group mb-3">
+                            <label for="title">Post Title</label>
+                            <input type="text" class="form-control" id="title" name="title" placeholder="Give your history post a meaningful title" required>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="history_date">History Date (Month/Year)</label>
+                            <input type="month" class="form-control" id="history_date" name="history_date" placeholder="YYYY-MM" required>
+                            <small class="text-muted">Select the month and year this historical content refers to</small>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="video">Media File (optional)</label>
+                            <input type="file" name="video" class="form-control" id="video" accept="video/*,audio/*" placeholder="Upload video or audio">
+                            <small class="text-muted">Supports videos, audio, and multimedia content</small>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="thumbnail">Post Image (optional)</label>
+                            <input type="file" class="form-control" id="thumbnail" name="thumbnail" accept="image/png, image/jpeg, image/jpg, image/webp, image/avif">
+                            <small class="text-muted">Add a cover image for your post</small>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="content">Content</label>
+                            <div class="form-group mb-3">
+                                <textarea name="content" id="content" style="height: 300px; width: 100%" placeholder="Share your historical content here" required></textarea>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100 btn-lg">Create History Post</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var quill = new Quill('#content', {
+        theme: 'snow',
+        modules: {
+            toolbar: [
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                ['blockquote', 'code-block'],
+                ['link', 'image']  // enable image upload button
+            ]
+        }
+    });
+
+    // Handle image uploads
+    function uploadImage(file) {
+        let formData = new FormData();
+        formData.append("image", file);
+
+        fetch("{{ url_for('upload_image') }}", {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.url) {
+                let range = quill.getSelection();
+                quill.insertEmbed(range.index, 'image', result.url);
+            } else {
+                alert("Upload failed: " + result.error);
+            }
+        })
+        .catch(err => {
+            console.error("Error uploading image:", err);
+        });
+    }
+
+    quill.getModule("toolbar").addHandler("image", () => {
+        let input = document.createElement("input");
+        input.type = "file";
+        input.accept = "image/*";
+        input.onchange = () => {
+            let file = input.files[0];
+            if (file) {
+                uploadImage(file);
+            }
+        };
+        input.click();
+    });
+
+    // Submit: copy Quill content into hidden textarea
+    document.querySelector("form").onsubmit = function() {
+        document.querySelector("#content").value = quill.root.innerHTML;
+    };
+
+</script>
+
+{% endblock %}

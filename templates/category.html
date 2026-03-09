@@ -1,9 +1,13 @@
 {% extends 'base.html' %}
-{% block title %} Poems | {{ category }}{% endblock %}
+{% block title %}{{ category|title }} Artworks | WaveZA{% endblock %}
 
 {% block content %}
 <div class="container py-5 col-lg-12">
-    <h2 class="mb-4 text-center text-muted" style="text-transform: capitalize;">{{ category }} Poems</h2>
+    {% if category in category != 'history' %}
+        <h2 class="mb-4 text-center text-primary" style="text-transform: capitalize;">{{ category.replace('-', ' ').title() }} Artworks</h2>
+    {% else %}
+        <h2 class="mb-4 text-center text-primary">South Africa's History</h2>
+    {% endif %}
     <!-- Carousel Start -->
     <div class="container-fluid mb-5 col-lg-12">
         <div class="row px-xl-1">
@@ -15,24 +19,43 @@
                     </ol> -->
                     <div class="carousel-inner col-lg-12 col-sm-6">
                         <div class="carousel-item position-relative active" style="height: 430px;">
-                            <img class="position-absolute" src="{{ url_for('static', filename='img/POETRY/cat-loving.jpg') }}" style="object-fit: cover; object-position: center; width: 100%">
-                            <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
-                                <h2 class="text-light text-uppercase font-weight-medium mb-3">Explore Poetry That Speaks To The Soul</h2>
-                            </div>
+                            {% if 'romance' in category %}
+                                <img class="position-absolute" src="{{ url_for('static', filename='img/POETRY/cat-loving.jpg') }}" style="object-fit: cover; object-position: center; width: 100%">
+                                <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
+                                    <h2 class="text-light text-uppercase font-weight-medium mb-3">Explore {{ category.replace('-', ' ').title() }} Art</h2>
+                                    <p>Find The {{ category.replace('-', '').title() }} Form Of Art That Satisfies Your Soul </p>
+                                </div>
+                            {% elif 'depression' in category %}
+                                <img class="position-absolute" src="{{ url_for('static', filename='img/POETRY/depression.jpg') }}" style="object-fit: cover; object-position: center; width: 100%">
+                                <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
+                                    <h2 class="text-light text-uppercase font-weight-medium mb-3">Explore {{ category.replace('-', ' ').title() }} Art</h2>
+                                    <p>Find The {{ category.replace('-', '').title() }} Form Of Art That Satisfies Your Soul </p>
+                                </div>
+                            {% elif 'film' in category %}
+                                <img class="position-absolute" src="{{ url_for('static', filename='img/POETRY/cat-anxiety.jpg') }}" style="object-fit: cover; object-position: center; width: 100%">
+                                <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
+                                    <h2 class="text-light text-uppercase font-weight-medium mb-3">Explore {{ category.replace('-', ' ').title() }} Art</h2>
+                                    <p>Find The {{ category.replace('-', '').title() }} Form Of Art That Satisfies Your Soul </p>
+                                </div>
+                            {% elif 'music' in category %}
+                                <img class="position-absolute" src="{{ url_for('static', filename='img/POETRY/depression.jpg') }}" style="object-fit: cover; object-position: center; width: 100%">
+                                <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
+                                    <h2 class="text-light text-uppercase font-weight-medium mb-3">Explore {{ category.replace('-', ' ').title() }} Art</h2>
+                                    <p>Find The {{ category.replace('-', '').title() }} Form Of Art That Satisfies Your Soul </p>
+                                </div>
+                            {% elif 'history' in category %}
+                                <img class="position-absolute" src="{{ url_for('static', filename='img/history.webp') }}" style="object-fit: cover; object-position: center; width: 100%">
+                                <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
+                                    <h2 class="text-light text-uppercase font-weight-medium mb-3">Explore {{ category.replace('-', ' ').title() }} Art</h2>
+                                </div>
+                            {% else %}
+                                <img class="position-absolute" src="{{ url_for('static', filename='img/POETRY/cat-anxiety.jpg') }}" style="object-fit: cover; object-position: center; width: 140%">
+                                <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
+                                    <h2 class="text-light text-uppercase font-weight-medium mb-3">Explore {{ category.replace('-', ' ').title() }} Art</h2>
+                                    <p>Find The {{ category.replace('-', '').title() }} Form Of Art That Satisfies Your Soul </p>
+                                </div>
+                            {% endif %}
                         </div>
-                        <div class="carousel-item position-relative" style="height: 430px;">
-                            <img class="position-absolute w-100 h-100" src="{{ url_for('static', filename='img/POETRY/cat-self.png') }}" style="object-fit: cover;">
-                            <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
-                                <h2 class="text-light text-uppercase font-weight-medium mb-3">Discover New Writers And Stories</h2>
-                            </div>
-                        </div>
-                        <div class="carousel-item position-relative" style="height: 430px;">
-                            <img class="position-absolute w-100 h-100" src="{{ url_for('static', filename='img/POETRY/depression.jpg') }}" style="object-fit: cover;">
-                            <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
-                                <h2 class="text-light text-uppercase font-weight-medium mb-3">Learn More About Others' Depression</h2>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
             </div>
@@ -44,17 +67,17 @@
         {% for poem in poems %}
         <div class="col-md-4 mb-4">
             <div class="card shadow-sm rounded">
-                {% if poem.thumbnail %}
+                {% if poem.thumbnail and poem.thumbnail.strip() %}
                 <div class="w-100">
                     <img src="{{ url_for('static', filename=poem.thumbnail) }}" class="card-img-top rounded-top" alt="">
                 </div>
                 {% endif %}
                 <div class="card-body" style="height: auto">
-                    <h5 class="card-title">{{ poem.title }}</h5>
+                    <h5 class="card-title text-primary">{{ poem.title }}</h5>
                     <div class="card-text" style="height: 100px;">
                         {{ poem.get_excerpt(150) }}
                     </div>
-                    <a href="{{ url_for('poem', poem_id=poem.id, slug=poem.slug) }}" class="btn btn-primary mt-4">Read More</a>
+                    <a href="{{ url_for('poem', poem_id=poem.id, slug=poem.slug) }}" class="btn btn-primary rounded mt-4">Read More</a>
                 </div>
             </div>
         </div>

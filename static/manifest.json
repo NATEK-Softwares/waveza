@@ -1,0 +1,102 @@
+{
+  "name": "WaveZA - Inclusive Art Platform",
+  "short_name": "WaveZA",
+  "description": "Discover and share art that speaks to the soul. Connect with artists and express yourself through poetry, stories, and visual arts.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#1a1a2e",
+  "prefer_related_applications": false,
+  "screenshots": [
+    {
+      "src": "/static/img/NEW/icons/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/img/NEW/icons/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "icons": [
+    {
+      "src": "/static/img/NEW/icons/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/img/NEW/icons/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/static/img/NEW/icons/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/img/NEW/icons/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["productivity", "entertainment", "lifestyle"],
+  "shortcuts": [
+    {
+      "name": "View All Art",
+      "short_name": "Art",
+      "description": "View all art on WaveZA",
+      "url": "/categories?utm_source=pwa&utm_medium=shortcut",
+      "icons": [
+        {
+          "src": "/static/img/NEW/icons/android-chrome-512x512.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "My Profile",
+      "short_name": "Profile",
+      "description": "View your WaveZA profile",
+      "url": "/profile?utm_source=pwa&utm_medium=shortcut",
+      "icons": [
+        {
+          "src": "/static/img/NEW/icons/android-chrome-512x512.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "image",
+          "accept": [
+            "image/png",
+            "image/jpeg",
+            "image/gif",
+            "image/webp"
+          ]
+        }
+      ]
+    }
+  }
+}

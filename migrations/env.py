@@ -1,11 +1,9 @@
 import logging
 from logging.config import fileConfig
+
 from flask import current_app
+
 from alembic import context
-from models import db
-
-
-target_metadata = db.metadata
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -21,7 +19,7 @@ def get_engine():
     try:
         # this works with Flask-SQLAlchemy<3 and Alchemical
         return current_app.extensions['migrate'].db.get_engine()
-    except (TypeError, AttributeError):
+    except TypeError:
         # this works with Flask-SQLAlchemy>=3
         return current_app.extensions['migrate'].db.engine
 
@@ -92,19 +90,14 @@ def run_migrations_online():
                 directives[:] = []
                 logger.info('No changes in schema detected.')
 
-    conf_args = current_app.extensions['migrate'].configure_args
-    # ✅ Add compare_type=True here
-    conf_args["compare_type"] = True
-    if conf_args.get("process_revision_directives") is None:
-        conf_args["process_revision_directives"] = process_revision_directives
-
     connectable = get_engine()
 
     with connectable.connect() as connection:
         context.configure(
             connection=connection,
             target_metadata=get_metadata(),
-            **conf_args
+            process_revision_directives=process_revision_directives,
+            **current_app.extensions['migrate'].configure_args
         )
 
         with context.begin_transaction():

@@ -16,7 +16,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(50), nullable=False, unique=True)
     email = db.Column(db.String(120), nullable=False, unique=True)
     password = db.Column(db.String(200), nullable=False)  # stores HASH, not plain password
-    role = db.Column(db.String(20), default="")  # "writer" or "reader"
+    role = db.Column(db.String(20), default="user")  # "user", "admin"
     push_subscription = db.Column(db.JSON, nullable=True)
     bio = db.Column(db.String(500), nullable=True)  # User bio
     profile_image = db.Column(db.String(255), nullable=True)  # Profile image path
@@ -25,10 +25,16 @@ class User(db.Model, UserMixin):
     profile_views = db.Column(db.Integer, default=0)  # Profile view count tracking
     is_public = db.Column(db.Boolean, default=True)  # Public profile visibility
     created_at = db.Column(db.DateTime, default=datetime.utcnow)  # Account creation date
+    id_number = db.Column(db.String(50), nullable=True)  # ID Number for registration
+    location = db.Column(db.String(200), nullable=True)  # User location
+    art_field = db.Column(db.String(100), nullable=True)  # Art field preference
+    popia_consent = db.Column(db.Boolean, default=False)  # POPIA data sharing consent
+    terms_accepted = db.Column(db.Boolean, default=False)  # T&Cs acceptance
 
     poems = db.relationship("Poem", backref="author", lazy=True)
     comments = db.relationship("Comment", backref="user", lazy=True)
     likes = db.relationship("Like", backref="user", lazy=True)
+    notifications = db.relationship("Notification", backref="user", lazy=True, cascade="all, delete-orphan")
 
     def set_password(self, raw_password: str) -> None:
         """Hash and store password securely"""
@@ -38,11 +44,11 @@ class User(db.Model, UserMixin):
         """Verify stored hash against a raw password"""
         return check_password_hash(self.password, raw_password)
 
-    def __init__(self, username: str, email: str, password: str, role: str = "writer") -> None:
+    def __init__(self, username: str, email: str, password: str, role=None) -> None:
         self.username = username
         self.email = email
         self.set_password(password)  # ✅ hash automatically
-        self.role = role
+        self.role = role if role else "reader"
 
     def __repr__(self) -> str:
         return f"<User {self.username}>"
@@ -145,20 +151,26 @@ class Poem(db.Model):
     video_url = db.Column(db.Text)
     video_public_id = db.Column(db.String(255))
     slug = db.Column(db.String(200), unique=True, nullable=False)  # ✅ NEW COLUMN
-
+    approval_status = db.Column(db.String(20), default="pending")  # "pending", "approved", "rejected"
+    admin_review_comments = db.Column(db.Text, nullable=True)  # Admin's review comments
+    submitted_at = db.Column(db.DateTime, default=datetime.utcnow)  # When post was submitted
+    history_date = db.Column(db.DateTime, nullable=True)  # Date for history posts (month/year)
 
     author_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     comments = db.relationship("Comment", backref="poem", lazy=True, cascade="all, delete-orphan")
     likes = db.relationship("Like", backref="poem", lazy=True, cascade="all, delete-orphan")
 
-    def __init__(self, title: str, content: str, author, category: str = None, new_category: str = None, thumbnail: str = None): #type: ignore
+    def __init__(self, title: str, content: str, author, category: str = None, new_category: str = None, thumbnail: str = None, video_url=None, video_public_id=None, history_date=None): #type: ignore
         self.title = title
         self.content = content
         self.author = author
         self.category = category
-        new_category = new_category
         self.thumbnail = thumbnail
         self.slug = slugify(title)  # ✅ auto-generate slug
+        self.video_url = video_url
+        self.video_public_id = video_public_id
+        self.history_date = history_date
+
 
     def __repr__(self):
         return f"<Poem {self.title}>"
@@ -210,3 +222,45 @@ class Like(db.Model):
 
     def __repr__(self) -> str:
         return f"<Like user={self.user_id} poem={self.poem_id}>"
+
+
+class Notification(db.Model):
+    """User notifications for post approvals, rejections, and admin alerts"""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    notification_type = db.Column(db.String(50), nullable=False)  # "post_approved", "post_rejected", "new_post_submitted"
+    poem_id = db.Column(db.Integer, db.ForeignKey("poem.id"), nullable=True)  # Related poem
+    is_read = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relationship to Poem
+    poem = db.relationship("Poem", backref="notifications")
+    
+    def __init__(self, user_id: int, title: str, message: str, notification_type: str, poem_id: int = None) -> None:
+        self.user_id = user_id
+        self.title = title
+        self.message = message
+        self.notification_type = notification_type
+        self.poem_id = poem_id
+    
+    def __repr__(self) -> str:
+        return f"<Notification {self.title}>"
+
+
+class PageView(db.Model):
+    """Track page views and traffic analytics"""
+    id = db.Column(db.Integer, primary_key=True)
+    page = db.Column(db.String(200), nullable=False)  # e.g., "landing_page"
+    user_agent = db.Column(db.String(500), nullable=True)
+    ip_address = db.Column(db.String(50), nullable=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def __init__(self, page: str, user_agent: str = None, ip_address: str = None) -> None:
+        self.page = page
+        self.user_agent = user_agent
+        self.ip_address = ip_address
+    
+    def __repr__(self) -> str:
+        return f"<PageView {self.page} at {self.timestamp}>"

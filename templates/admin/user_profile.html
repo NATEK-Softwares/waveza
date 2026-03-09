@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">User Profile: {{ user.username }}</h1>
+            
+            <!-- User Details -->
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Account Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <p><strong>Username:</strong> {{ user.username }}</p>
+                            <p><strong>Email:</strong> {{ user.email }}</p>
+                            <p><strong>Role:</strong> {{ user.role }}</p>
+                            <p><strong>ID Number:</strong> {{ user.id_number or '-' }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <p><strong>Location:</strong> {{ user.location or '-' }}</p>
+                            <p><strong>Art Field:</strong> {{ user.art_field or '-' }}</p>
+                            <p><strong>Joined:</strong> {{ (user.created_at | localtime).strftime('%Y-%m-%d %H:%M') }}</p>
+                            <p><strong>Profile Views:</strong> {{ user.profile_views }}</p>
+                        </div>
+                    </div>
+                    {% if user.bio %}
+                    <hr>
+                    <p><strong>Bio:</strong></p>
+                    <p>{{ user.bio }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- User's Posts -->
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">User's Posts</h5>
+                </div>
+                <div class="card-body">
+                    {% if posts %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Category</th>
+                                        <th>Status</th>
+                                        <th>Created</th>
+                                        <th>Likes</th>
+                                        <th>Comments</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for post in posts %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ post.title }}</strong>
+                                        </td>
+                                        <td>{{ post.category or 'Uncategorized' }}</td>
+                                        <td>
+                                            {% if post.approval_status == 'pending' %}
+                                                <span class="badge bg-warning">Pending</span>
+                                            {% elif post.approval_status == 'approved' %}
+                                                <span class="badge bg-success">Approved</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Rejected</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ (post.timestamp | localtime).strftime('%Y-%m-%d') }}</td>
+                                        <td>{{ post.likes|length }}</td>
+                                        <td>{{ post.comments|length }}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-info rounded" data-bs-toggle="modal" data-bs-target="#postModal{{ post.id }}">
+                                                View
+                                            </button>
+                                            {% if post.approval_status != 'approved' %}
+                                            <button class="btn btn-sm btn-danger rounded" data-bs-toggle="modal" data-bs-target="#deleteModal{{ post.id }}">
+                                                Delete
+                                            </button>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+
+                                    <!-- Post Modal -->
+                                    <div class="modal fade" id="postModal{{ post.id }}" tabindex="-1">
+                                        <div class="modal-dialog modal-lg">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">{{ post.title }}</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p><strong>Category:</strong> {{ post.category or 'Uncategorized' }}</p>
+                                                    <p><strong>Status:</strong> {{ post.approval_status }}</p>
+                                                    <hr>
+                                                    <div class="post-content">
+                                                        {{ post.content|safe }}
+                                                    </div>
+                                                    {% if post.admin_review_comments %}
+                                                    <hr>
+                                                    <p><strong>Admin Comments:</strong></p>
+                                                    <p>{{ post.admin_review_comments }}</p>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Delete Confirmation Modal -->
+                                    <div class="modal fade" id="deleteModal{{ post.id }}" tabindex="-1">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Delete Post?</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p>Are you sure you want to delete this post? This action cannot be undone.</p>
+                                                    <p><strong>{{ post.title }}</strong></p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <form method="POST" action="{{ url_for('admin_delete_post', user_id=user.id, poem_id=post.id) }}">
+                                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">This user has not created any posts.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Back Button -->
+            <div class="mt-4">
+                <a href="{{ url_for('admin_users') }}" class="btn btn-info rounded"><span class="fas fa-arrow-left"></span> Back to Users</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

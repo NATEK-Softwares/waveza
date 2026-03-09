@@ -671,3 +671,81 @@ Install with: `pip install markdown`
 **Last Updated:** January 18, 2026
 **Version:** 2.1
 **Status:** Production Ready ✅
+
+
+=================== NEW DIRECTION =====================
+### MODIFICATIONS OF APP TO BE A GOVERNMENT ART PROMOTION PLATFORM FOR ALL FORMS OF ART
+
+**UPGRADES**
+
+**Database Changes** 
+   - New db to be initialized for WaveZA as wavedb via PostgreSQL 
+   - New models, columns, etc...
+
+**Build a new Admin Panel**
+- Admin has to approve every user's post before it goes public
+
+   `WORKFLOW`
+   - ***User***
+      - Creates post
+      - Receives notification --> Pending Admin approval
+      - Post approved --> Post goes live
+
+   - ***Admin***
+      - User creates post --> Receives notification of NEW POST
+      - Reviews post ethically 
+      - Approves/disapproves post
+      - If `Approved` --> User receives notification `(Post approved)` --> Post is public
+      - If `Disapproved` -- User receives notification `(Post rejected)` with review comments(admin)
+
+   **UI/UX LAYOUT**
+   `Viewer` --> Landing page
+   `Landing page` -> Categories of art in the country 
+   `Navbar menu`
+         `Music`
+         `Visual Arts` --> Dropdown `(Painting, Dance, sculptures)`
+         `Dramatic Arts` --> Dropdown `(Theatre, Short Film, Skits)`
+         `Written Art` --> Dropdown `(Poetry, Short Stories, Novels, Fiction, Non-Fiction)`
+
+      ***CATEGORIES SECTION***
+         `Music`
+         `Visual Arts` --> Page of relevant/listed categories
+         `Dramatic Arts` --> Page of relevant/listed categories
+         `Written Art` --> Page of relevant/listed categories
+      
+      ***LATES ART SECTION***
+         *
+
+   **User Workflow**
+   `User` --> Landing page --> Register
+      - `Profile page` --> Complete profile
+      - `Dashboard` --> See profile, see profile views, See created posts/work
+      - `Create Post` --> Select category, add content(video, image, written) --> Post
+      - Receive notification of `post sent to admin for review`
+      - Admin approves --> Post goes live
+      - Receives notification of `Admin approved your post | Action CTA 'view post'`
+
+   `Admin` --> login page --> Admin Dashboard
+      **FEATURES**
+      - Sees numbber of `registered users`
+      - Sees number of `posts created`
+      - Tile - `Users` --> List of users - viewable per user --> Display user's profile and content (content is manageable, `delete post` => confirmation modal) 
+      - TIle - Traffic (number of landing page HTTP REQUESTS) per period --> Traffic page
+      - `Traffic page` - Graph of HTTP REQUESTS
+                        - `Action Keys` - 24hrs | 7 Days | 30 Days
+
+   `User Registration`
+   **Form**
+      - Personal details (* indicates required field)
+         - Names, surname *
+         - ID Number *
+         - Location
+         - Art Field 
+         - T's And C's confirmation
+
+      - POPIA Practice Confirmation
+         - Allow the department of Arts And Culture to share your work and/or personal details if necessary
+
+
+
+      

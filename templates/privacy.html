@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% block title %}Privacy Policy | WaveZA{% endblock %}
+{% block content %}
+
+<div class="privacy-policy-container my-5">
+    <h1 class="mt-3">🔒 Privacy Policy</h1>
+    <p class="text-muted"><strong>Last Updated:</strong> {{ (now | localtime).strftime('%B %d, %Y') }}</p>
+
+    <section>
+        <h2 class="text-primary p-3 rounded" style="background-color: #6d6d6dff">1. Introduction</h2>
+        <p>WaveZA ("we", "us", "our") operates the WaveZA platform. This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our Service. We are committed to protecting your privacy and ensuring you have a positive experience on our platform.</p>
+    </section>
+
+    <section>
+        <h2 class="text-primary p-3 rounded" style="background-color: #6d6d6dff">2. Information Collection and Use</h2>
+        <p>We collect several different types of information for various purposes to enhance your experience:</p>
+        <ul>
+            <li><strong>Account Information:</strong> Name, email address, phone number, and profile details</li>
+            <li><strong>Usage Data:</strong> Browser type, IP address, pages visited, and timestamps</li>
+            <li><strong>Communication:</strong> Messages and support requests you submit to us</li>
+            <li><strong>Content Data:</strong> Artworks, poems, and creative content you upload</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2 class="text-primary p-3 rounded" style="background-color: #6d6d6dff">3. Use of Data</h2>
+        <p>WaveZA uses the collected data for purposes including:</p>
+        <ul>
+            <li>Providing and maintaining our Service</li>
+            <li>Notifying you about changes to our Service</li>
+            <li>Allowing you to participate in interactive features</li>
+            <li>Providing customer support and responding to inquiries</li>
+            <li>Gathering analytics to improve our Service</li>
+            <li>Detecting and preventing fraudulent activities</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2 class="text-primary p-3 rounded" style="background-color: #6d6d6dff">4. Security of Data</h2>
+        <p>The security of your data is important to us but no method of transmission over the Internet is 100% secure. We use industry-standard encryption methods and follow best practices to protect your information from unauthorised access and usage. Your data is stored on secure servers with multiple layers of protection.</p>
+    </section>
+
+    <section>
+        <h2 class="text-primary p-3 rounded" style="background-color: #6d6d6dff">5. Contact Us</h2>
+        <p>If you have any questions about this Privacy Policy, please contact us at:</p>
+        <p>📧 Email: <strong><a href="mailto:privacy@waveza.gov.za" class="text-decoration-none">privacy@waveza.gov.za</a></strong></p>
+    </section>
+
+    <section class="FAQ-dropdown">
+        <h2>❓ Frequently Asked Questions</h2>
+        <div class="accordion" id="privacyFAQ">
+            <div class="accordion-item mx-sm-2">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed rounded border border-primary" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                        How long do you retain my data?
+                    </button>
+                </h2>
+                <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#privacyFAQ">
+                    <div class="accordion-body">
+                        We retain your personal data for as long as necessary to provide our Service and comply with legal obligations. You can request deletion of your data at any time by contacting us, subject to certain legal requirements.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed rounded border border-primary" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                        Can I request my data?
+                    </button>
+                </h2>
+                <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#privacyFAQ">
+                    <div class="accordion-body">
+                        Yes, you have the right to access your personal data. You can request a copy of your personal data by contacting us at <a href="mailto:privacy@waveza.gov.za">privacy@waveza.gov.za</a>. We will respond to your request within 30 days.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed rounded border border-primary" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                        Do you share my data with third parties?
+                    </button>
+                </h2>
+                <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#privacyFAQ">
+                    <div class="accordion-body">
+                        We do not sell or rent your personal data. We may share it with service providers who assist us in operating our platform under strict confidentiality agreements. These partners are bound by similar privacy obligations.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                        How do you protect my password?
+                    </button>
+                </h2>
+                <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#privacyFAQ">
+                    <div class="accordion-body">
+                        Your password is encrypted and stored securely using industry-standard hashing algorithms. We never store your password in plain text. We recommend using a strong, unique password and enabling two-factor authentication if available.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+                        Can I delete my account?
+                    </button>
+                </h2>
+                <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#privacyFAQ">
+                    <div class="accordion-body">
+                        Yes, you can delete your account at any time through your account settings. Please note that some data may be retained for legal or operational purposes, and publicly shared content may remain visible.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq6">
+                        Do you use cookies?
+                    </button>
+                </h2>
+                <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#privacyFAQ">
+                    <div class="accordion-body">
+                        Yes, we use cookies to enhance your experience, remember your preferences, and understand how you use our platform. You can control cookie preferences through your browser settings. Essential cookies cannot be disabled as they are necessary for the platform to function.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+
+
+{% endblock %}

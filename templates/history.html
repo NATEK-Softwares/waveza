@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}SA History{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4 text-light py-4">South Africa's History</h1>
+
+    {% if years %}
+        <div class="mb-4">
+            <label for="dateSelect" class="form-label text-light">Filter by Year:</label>
+            <select class="form-select" id="dateSelect" onchange="filterByDate()">
+                <option value="">All Years</option>
+                {% for year in years %}
+                    <option value="{{ year }}" {% if selected_date == year|string %}selected{% endif %}>{{ year }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    {% endif %}
+
+    {% if grouped_posts %}
+        {% for interval, posts in grouped_posts.items() %}
+            <div class="mb-5">
+                <h3 class="mb-3 text-light border-bottom">{{ interval }}</h3>
+                <div class="row">
+                    {% for post in posts %}
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100 rounded shadow-sm">
+                                {% if post.video_url %}
+                                    <div class="ratio ratio-16x9">
+                                        <iframe src="{{ post.video_url }}" title="{{ post.title }}" allowfullscreen></iframe>
+                                    </div>
+                                {% endif %}
+                                
+                                {% if post.thumbnail %}
+                                    <img src="{{ url_for('static', filename=post.thumbnail) }}" class="card-img-top" alt="{{ post.title }}">
+                                {% endif %}
+                                <div class="card-body">
+                                    <h5 class="card-title text-light border-bottom">{{ post.title }}</h5>
+                                    <p class="card-text">{{ post.excerpt }}</p>
+                                    {% if post.history_date %}
+                                    <p class="text-muted small">Date: {{ (post.history_date | localtime).strftime('%B %Y') }}</p>
+                                    {% endif %}
+                                    <a href="{{ url_for('poem', poem_id=post.id, slug=post.slug) }}" class="btn btn-primary rounded p-1">Read More</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="text-center mt-5">
+            <p class="text-muted">No history posts available yet.</p>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    function filterByDate() {
+        const selectedDate = document.getElementById('dateSelect').value;
+        const url = selectedDate ? `{{ url_for('history') }}?date=${selectedDate}` : `{{ url_for('history') }}`;
+        window.location.href = url;
+    }
+</script>
+{% endblock %}

@@ -1,27 +1,27 @@
 {% extends 'base.html' %}
-{% block title %}Poems | MishWrites{% endblock %}
+{% block title %}Discover Art | WaveZA{% endblock %}
 
 {% block content %}
 <!-- Carousel Start -->
 <div class="container-fluid mb-1" style="margin-top: 80px;">
     <div class="row px-xl-5">
         <div class="col-lg-12">
+            <div class="header-carousel text-center my-5" style="">
+                <h2 class="text-light text-uppercase font-weight-medium mb-3">Explore Art That Speaks To The Soul</h2>
+                <p class="text-light">Poetry, Visual Art, Music, Dance, and More</p>
+            </div>
             <div id="header-carousel" class="carousel slide carousel-fade mb-lg-0" data-ride="carousel">
-                <!-- <ol class="carousel-indicators">
-                    <li data-target="#header-carousel" data-slide-to="0" class="active"></li>
-                    <li data-target="#header-carousel" data-slide-to="1"></li>
-                </ol> -->
                 <div class="carousel-inner">
-                    <div class="carousel-item position-relative active" style="height: 600px;">
-                        <img class="position-absolute w-100 h-100" src="{{ url_for('static', filename='img/POETRY/poetry.jpg') }}" style="object-fit: cover; object-position: center;">
+                    <div class="carousel-item position-relative active d-none" style="height: 600px;">
+                        <!--<img class="position-absolute w-100 h-100" src="{{ url_for('static', filename='img/painting.jpg') }}" style="object-fit: cover; object-position: center;">-->
                         <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
-                            <h2 class="text-light text-uppercase font-weight-medium mb-3">Explore Poetry That Speaks To The Soul</h2>
                         </div>
                     </div>
-                    <div class="carousel-item position-relative" style="height: 600px;">
-                        <img class="position-absolute w-100 h-100" src="{{ url_for('static', filename='img/POETRY/Getty.jpg') }}" style="object-fit: cover; object-position: top;">
+                    <div class="carousel-item position-relative d-none" style="height: 600px;">
+                        <!--<img class="position-absolute w-100 h-100" src="{{ url_for('static', filename='img/painting.jpg') }}" style="object-fit: cover; object-position: top;">-->
                         <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
-                            <h2 class="text-light text-uppercase font-weight-medium mb-3">Discover New Writers And Stories</h2>
+                            <h2 class="text-light text-uppercase font-weight-medium mb-3">Discover Artists & Creative Works</h2>
+                            <p class="text-light">Share Your Passion, Connect With Creators</p>
                         </div>
                     </div>
                 </div>
@@ -31,91 +31,84 @@
 </div>
 <!-- Carousel End -->
 
-<!-- Featured Categories Start -->
-<h2 class="section-title position-relative text-uppercase text-center mx-xl-5 mt-5 mb-4">
-    <span class="bg-secondary px-3">Poem Categories</span>
-</h2>
+<!-- Featured Art Categories Start -->
+<div class="text-center mx-auto">
+    <h2 class="section-title position-relative text-uppercase text-center ml-auto mr-auto mt-5 mb-4">
+        <span class="bg-secondary px-3 rounded">Art Categories</span>
+    </h2>
+</div>
 
-<div class="row">
-    {% for category, count in nav_categories [:4] %}
+<div class="row text-center d-flex flex-direction-row align-items-center justify-content-center">
+    {% for category, count in categories %}
         {% if category %}
-        <div class="col-lg-4 col-md-4 col-sm-6 py-1">
+        <div class="col-lg-3 col-md-4 col-sm-6 py-1">
             <a class="text-decoration-none" href="{{ url_for('category', name=category) }}">
-                <div class="cat-item d-flex align-items-center mb-4">
-                    <div class="overflow-hidden" style="width: 150px; height: 110px;">
-                        <img class="img-fluid" src="{{ category_images[category] }}" alt="" style="width: 100%; height: 100%">
+                <div class="cat-item d-flex align-items-center mb-4 p-3" style="background: linear-gradient(90deg, #f0f0f01b, #c62e2eff); border-radius: 8px;">
+                    <div class="flex-fill">
+                        <h5 class="mb-1 text-primary">{{ category.replace('-', ' ').title() }}</h5>
+                        <small class="text-light">({{ count }} artworks)</small>
                     </div>
-                    <div class="flex-fill pl-3">
-                        <h4>{{ category.replace('-', ' ').title() }}</h4>
-                        <small class="text-muted">({{ count }} poems)</small>
-                    </div>
+                    <div class="text-primary" style="font-size: 1.5rem;">→</div>
                 </div>
             </a>
         </div>
         {% endif %}
     {% endfor %}
 </div>
+
 <div class="row">
-    <div class="col-lg-3 col-md-4 col-sm-6 ml-auto p-0 mr-auto rounded">
-        <a class="text-decoration-none text-center h-100" href="{{ url_for('categories', name='category')}}">
+    <div class="col-lg-3 col-md-4 col-sm-6 ml-auto p-0 mr-auto w-50 rounded">
+        <a class="text-decoration-none text-center h-100 w-50" href="{{ url_for('categories')}}">
             <div class="cat-item d-flex align-items-center pt-4 pb-4 rounded" id="more-categories">
                 <div class="flex-fill">
-                    <h4 class="text-light">
-                        More Categories <span class="fa fa-plus"></span>
-                    </h4>
+                    <h5 class="text-light mb-0">
+                        View All Art Categories <span class="fa fa-arrow-right"></span>
+                    </h5>
                 </div>
             </div>
         </a>
     </div>
 </div>
-<!-- Featured Categories End -->
+<!-- Featured Art Categories End -->
 
-<!-- Poems Start -->
-<div class="container-fluid pt-5" id="biggest-reads">
-    <h2 class="section-title position-relative text-uppercase text-center mx-xl-5 mb-4">
-        <span class="bg-secondary px-3">Latest Poems</span>
-    </h2>
-    <div class="row px-xl-5 pb-3">
-        {% for poem in poems [:8]  %}
-        <div class="col-lg-4 col-md-4 col-sm-6 pb-1">
-            <a class="text-decoration-none" href="{{ url_for('poem', poem_id=poem.id, slug=poem.slug) }}" data-bs-toggle="modal" data-bs-target="#modal-{{ poem.slug }}">
-                <div class="cat-item d-flex align-items-center mb-4">
-                    <div class="overflow-hidden rounded-left" style="width: 150px; height: 110px; display: flex; align-items: center; justify-content: center;">
-                        {% if poem.thumbnail %}
-                            <img class="img-fluid w-100 h-100" src="{{ url_for('static', filename=poem.thumbnail) }}" alt="{{ poem.title }}" style="object-fit: cover;">
-                        {% else %}
-                            <div style="text-align: center; color: white; font-size: 2rem;">✨</div>
-                        {% endif %}
+<!-- Latest Artworks Start -->
+<div class="container-fluid pt-5 border-top mt-5" id="biggest-reads">
+    <div class="text-center mx-auto">
+        <h2 class="section-title position-relative text-uppercase text-center mb-4">
+            <span class="bg-secondary px-3 mx-auto rounded">Latest Artworks</span>
+        </h2>
+    </div>
+    <div class="row px-xl-5 pb-3 d-flex flex-direction-row">
+        {% if poems %}
+            {% for poem in poems [:12]  %}
+            <div class="col-lg-4 col-md-6 col-sm-12 pb-3 justify-content-center mx-auto">
+                <a class="text-decoration-none" href="{{ url_for('poem', poem_id=poem.id, slug=poem.slug) }}">
+                    <div class="card h-100 shadow-sm" style="border: none; border-radius: 8px; overflow: hidden;">
+                        <div style="height: 200px; background: #f0f0f0; display: flex; align-items: center; justify-content: center;">
+                            {% if poem.thumbnail and poem.thumbnail.strip() %}
+                                <img class="w-100 h-100" src="{{ url_for('static', filename=poem.thumbnail) }}" alt="{{ poem.title }}" style="object-fit: cover;">
+                            {% else %}
+                                <div style="text-align: center; color: #999; font-size: 3rem;">🎨</div>
+                            {% endif %}
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title text-primary">{{ poem.title }}</h5>
+                            <p class="card-text text-light small">By <strong>{{ poem.author.username }}</strong></p>
+                            <small class="text-muted">{{ poem.category.replace('-', ' ').title() if poem.category else 'Uncategorized' }}</small>
+                            <div class="text-muted small mt-2">{{ (poem.timestamp | localtime).strftime('%b %d, %Y') }}</div>
+                        </div>
                     </div>
-                    <div class="flex-fill pl-3">
-                        <h6>{{ poem.title }}</h6>
-                        <small class="text-body">{{ poem.author.username }}</small><br>
-                        <small class="text-muted">{{ poem.timestamp.strftime('%b %d, %Y') }}</small>
-                    </div>
-                </div>
-            </a>
-        </div>
-        <!-- Modal for poem preview -->
-        <div class="modal fade" id="modal-{{ poem.slug }}" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content rounded">
-                    <div class="modal-header">
-                        <h2 class="modal-title">{{ poem.title }}</h2>
-                        <button type="button" class="btn text-danger" data-bs-dismiss="modal">
-                            <span class="fa fa-times"></span>
-                        </button>
-                    </div>
-                    <div class="mb-4 text-dark px-3 mt-3" style="white-space: pre-line;">
-                        {{ poem.get_excerpt()|safe }} 
-                        <a href="{{ url_for('poem', poem_id=poem.id, slug=poem.slug) }}"><i>...read more</i></a>
-                    </div>
-                </div>
+                </a>
             </div>
-        </div>
-        {% endfor %}
+            {% endfor %}
+        {% else %}
+            <div class="col-12 text-center text-muted">
+                <p>No artworks yet. Be the first to share your art!</p>
+            </div>
+        {% endif %}
     </div>
 </div>
-<!-- Poems End -->
+<!-- Latest Artworks End -->
 
 <style>
 

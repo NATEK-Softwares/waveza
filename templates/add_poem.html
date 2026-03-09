@@ -1,58 +1,65 @@
 {% extends 'base.html' %}
-{% block title %}Add Poem{% endblock %}
+{% block title %}Share Your Art{% endblock %}
 
 {% block content %}
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <div class="card shadow-sm">
+            <div class="card shadow-sm mt-5">
                 <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">Add New Poem</h4>
+                    <h4 class="mb-0">Share Your Art</h4>
                 </div>
                 <div class="card-body">
                     <form method="POST" action="{{ url_for('add_poem') }}" enctype="multipart/form-data">
                         <div class="form-group mb-3">
-                            <label for="title">Title</label>
-                            <input type="text" class="form-control" id="title" name="title" required>
+                            <label for="title">Art Title</label>
+                            <input type="text" class="form-control" id="title" name="title" placeholder="Give your art a meaningful title" required>
                         </div>
 
                         <div class="form-group mb-3">
-                            <label for="category">Category</label>
+                            <label for="category">Art Category</label>
                             <select class="form-control" id="category" name="category">
                                 <option value="">-- Select a category --</option>
-                                <option value="romance">Romance</option>
-                                <option value="anxiety">Anxiety</option>
-                                <option value="self-introspection">Self-Introspection</option>
-                                <option value="black-consciousness">Black Consciousness</option>
-                                <option value="democracy">Democracy</option>
-                                <option value="depression">Depression</option>
+                                <option value="poetry">Poetry</option>
+                                <option value="visual-art">Visual Art</option>
+                                <option value="music">Music</option>
+                                <option value="dance">Dance</option>
+                                <option value="photography">Photography</option>
+                                <option value="film">Film/Video</option>
+                                <option value="digital-art">Digital Art</option>
+                                <option value="sculpture">Sculpture</option>
+                                <option value="performance">Performance Art</option>
+                                <option value="mixed-media">Mixed Media</option>
+                                <option value="other">Other</option>
                             </select>
                         </div>
 
                         <div class="form-group mb-3">
-                            <label for="new-category">Or add a new category</label>
-                            <input type="text" name="new_category" class="form-control" id="new-category" placeholder="New Category">
+                            <label for="new_category">Or add a custom category</label>
+                            <input type="text" name="new_category" class="form-control" id="new_category" placeholder="Create a new category">
                         </div>
 
                         <div class="form-group mb-3">
-                            <label for="video">Poem Video</label>
-                            <input type="file" name="video" class="form-control" id="video" accept="video/*" placeholder="Upload your video">
+                            <label for="video">Media File (optional)</label>
+                            <input type="file" name="video" class="form-control" id="video" accept="video/*,audio/*" placeholder="Upload video or audio">
+                            <small class="text-muted">Supports videos, audio, and multimedia content</small>
                         </div>
 
                         <div class="form-group mb-3">
-                            <label for="thumbnail">Poem Image (optional)</label>
-                            <input type="file" class="form-control" id="thumbnail" name="thumbnail" required accepted="image/png, image/jpeg, image/jpg, image/webp">
+                            <label for="thumbnail">Artwork Image (optional)</label>
+                            <input type="file" class="form-control" id="thumbnail" name="thumbnail" accept="image/png, image/jpeg, image/jpg, image/webp, image/avif">
+                            <small class="text-muted">Add a cover image for your artwork</small>
                         </div>
 
                         <div class="form-group mb-3">
-                            <label for="content">Poem</label>
+                            <label for="content">Description / Content</label>
                             <div class="form-group mb-3">
-                                <textarea name="content" id="content" style="height: 300px; width: 100%" placeholder="Poem goes here" required></textarea>
+                                <textarea name="content" id="content" style="height: 300px; width: 100%" placeholder="Describe your art or share your content here" required></textarea>
                             </div>
 
                         </div>
 
-                        <button type="submit" class="btn btn-success w-100">Publish Poem</button>
+                        <button type="submit" class="btn btn-success w-100 btn-lg">Submit Artwork</button>
                     </form>
                 </div>
             </div>
